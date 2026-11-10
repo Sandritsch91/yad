@@ -1,5 +1,7 @@
 # yad — Yet Another Datepicker
 
+[![Tests](https://github.com/Sandritsch91/yad/actions/workflows/test.yml/badge.svg)](https://github.com/Sandritsch91/yad/actions/workflows/test.yml)
+
 A dependency-free datepicker written in TypeScript, with an API modelled on
 [jQuery UI's datepicker](https://api.jqueryui.com/datepicker/), without jQuery.
 
