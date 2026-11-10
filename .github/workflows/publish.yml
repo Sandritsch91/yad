@@ -1,0 +1,70 @@
+name: Publish to npm
+
+# Publishes when a GitHub release is published. The release tag must match package.json, e.g. v0.2.0.
+# Pre-release versions (e.g. 0.2.0-beta.1) are published under the "next" dist-tag instead of "latest".
+#
+# Authentication: npm trusted publishing (OIDC). No token needed once the trusted publisher is
+# configured on npmjs.com (package settings → Trusted publisher → GitHub Actions,
+# repository Sandritsch91/yad, workflow publish.yml, environment npm).
+# Until then (e.g. for the very first publish) an NPM_TOKEN repository secret is used if present.
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+  id-token: write # required for trusted publishing and provenance
+
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: npm
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+          cache: npm
+
+      # Trusted publishing needs npm >= 11.5.1
+      - run: npm install -g npm@latest
+
+      - name: Check tag matches package.json version
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          if [ "${TAG#v}" != "$VERSION" ]; then
+            echo "::error::Release tag $TAG does not match package.json version $VERSION"
+            exit 1
+          fi
+
+      - run: npm ci
+
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Test
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      - name: Publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          PRERELEASE: ${{ github.event.release.prerelease }}
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          if [ "$PRERELEASE" = "true" ] || [[ "$VERSION" == *-* ]]; then
+            npm publish --provenance --tag next
+          else
+            npm publish --provenance
+          fi

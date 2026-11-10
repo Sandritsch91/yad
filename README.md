@@ -7,9 +7,13 @@ A dependency-free datepicker written in TypeScript, with an API modelled on
 
 ## Usage
 
+```bash
+npm install @sandritsch91/yad
+```
+
 ```js
-import { Yad } from 'yad';
-import 'yad/yad.css';
+import { Yad } from '@sandritsch91/yad';
+import '@sandritsch91/yad/yad.css';
 
 // Attach to an <input> → popup; attach to a <div> → inline calendar
 const dp = new Yad('#date', { dateFormat: 'yy-mm-dd', minDate: 0, maxDate: '+1m' });
@@ -38,8 +42,8 @@ Override the CSS custom properties (`.yad { --yad-accent: hotpink; }`) or load a
 
 ```js
 import 'bootstrap/dist/css/bootstrap.min.css';
-import 'yad/yad.css';
-import 'yad/themes/bootstrap5.css';
+import '@sandritsch91/yad/yad.css';
+import '@sandritsch91/yad/themes/bootstrap5.css';
 ```
 
 The **Bootstrap 5** theme takes its colours, radii, focus rings and shadows from Bootstrap's CSS
