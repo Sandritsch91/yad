@@ -1,5 +1,6 @@
 # yad — Yet Another Datepicker
 
+[![npm](https://img.shields.io/npm/v/@sandritsch91/yad)](https://www.npmjs.com/package/@sandritsch91/yad)
 [![Tests](https://github.com/Sandritsch91/yad/actions/workflows/test.yml/badge.svg)](https://github.com/Sandritsch91/yad/actions/workflows/test.yml)
 
 A dependency-free datepicker written in TypeScript, with an API modelled on
