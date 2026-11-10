@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>yad demo</title>
+  <style>
+    :root { color-scheme: light dark; }
+    body { font: 15px/1.5 system-ui, sans-serif; max-width: 900px; margin: 0 auto; padding: 24px 16px 120px; }
+    h1 { margin-bottom: 0; }
+    section { margin: 28px 0; }
+    h2 { font-size: 1.05rem; margin: 0 0 8px; }
+    code { font-size: 0.85em; background: rgba(127,127,127,.15); padding: 1px 5px; border-radius: 4px; }
+    input { font: inherit; padding: 6px 8px; }
+    .row { display: flex; gap: 32px; flex-wrap: wrap; align-items: flex-start; }
+    .out { color: #888; font-size: 0.9em; margin-top: 6px; }
+  </style>
+</head>
+<body>
+  <h1>yad</h1>
+  <p>Yet Another Datepicker: dependency-free, with a jQuery UI compatible API.</p>
+
+  <section>
+    <h2>Default popup</h2>
+    <input id="basic" placeholder="mm/dd/yyyy">
+    <p><code>new Yad('#basic')</code></p>
+  </section>
+
+  <section>
+    <h2>Dropdowns, button panel, week numbers</h2>
+    <input id="full">
+    <p><code>{ changeMonth: true, changeYear: true, showButtonPanel: true, showWeek: true, firstDay: 1 }</code></p>
+  </section>
+
+  <section>
+    <h2>Restricted range: today to +2 months, no weekends</h2>
+    <input id="range">
+    <p><code>{ minDate: 0, maxDate: '+2m', beforeShowDay: Yad.noWeekends }</code></p>
+  </section>
+
+  <section>
+    <h2>Trigger button, altField, German locale</h2>
+    <input id="german"> <span class="out">alt field: <input id="alt" readonly size="12"></span>
+    <p><code>{ ...Yad.regional.de, showOn: 'both', buttonText: '📅', altField: '#alt', altFormat: 'yy-mm-dd' }</code></p>
+  </section>
+
+  <section>
+    <h2>French locale</h2>
+    <input id="french">
+    <p><code>{ ...Yad.regional.fr, changeMonth: true, changeYear: true, showButtonPanel: true }</code></p>
+  </section>
+
+  <section>
+    <h2>Three months</h2>
+    <input id="multi">
+    <p><code>{ numberOfMonths: 3, showCurrentAtPos: 1, showOtherMonths: true }</code></p>
+  </section>
+
+  <section class="row">
+    <div>
+      <h2>Inline</h2>
+      <div id="inline"></div>
+      <div class="out" id="inline-out">Nothing selected</div>
+    </div>
+    <div>
+      <h2>Inline, RTL</h2>
+      <div id="rtl"></div>
+    </div>
+  </section>
+
+  <script type="module">
+    import { Yad } from './src/index.ts';
+    window.Yad = Yad;
+
+    new Yad('#basic');
+    new Yad('#full', { changeMonth: true, changeYear: true, showButtonPanel: true, showWeek: true, firstDay: 1 });
+    new Yad('#range', { minDate: 0, maxDate: '+2m', beforeShowDay: Yad.noWeekends });
+    new Yad('#german', {
+      ...Yad.regional.de, showOn: 'both', buttonText: '📅', altField: '#alt', altFormat: 'yy-mm-dd',
+    });
+    new Yad('#french', { ...Yad.regional.fr, changeMonth: true, changeYear: true, showButtonPanel: true });
+    new Yad('#multi', { numberOfMonths: 3, showCurrentAtPos: 1, showOtherMonths: true });
+    new Yad('#inline', {
+      dateFormat: 'DD, d MM yy',
+      onSelect: (text) => { document.getElementById('inline-out').textContent = text; },
+    });
+    new Yad('#rtl', {
+      isRTL: true,
+      monthNames: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'],
+      dayNamesMin: ['ح', 'ن', 'ث', 'ر', 'خ', 'ج', 'س'],
+      firstDay: 6,
+    });
+  </script>
+</body>
+</html>

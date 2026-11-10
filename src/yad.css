@@ -1,0 +1,356 @@
+/* Yet Another Datepicker. Theme it by overriding the custom properties below, e.g.
+   .yad { --yad-accent: hotpink; }  or load a theme file such as themes/bootstrap5.css.
+   Variables are declared in zero-specificity :where() blocks so any .yad rule wins. */
+:where(.yad) {
+  --yad-font: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --yad-font-size: 14px;
+  --yad-bg: #fff;
+  --yad-fg: #1f2328;
+  --yad-muted: #8b949e;
+  --yad-border: #d0d7de;
+  --yad-radius: 8px;
+  --yad-shadow: 0 8px 24px rgba(31, 35, 40, 0.15);
+  --yad-hover-bg: #eef2f6;
+  --yad-accent: #2563eb;
+  --yad-accent-fg: #fff;
+  --yad-today-ring: #2563eb;
+  --yad-weekend: #6e7781;
+  --yad-cell: 2.25em;
+  --yad-gap: 12px;
+  --yad-duration: 200ms;
+  --yad-z: 1000;
+}
+
+@media (prefers-color-scheme: dark) {
+  :where(.yad:not(.yad--light)) {
+    --yad-bg: #1c2128;
+    --yad-fg: #e6edf3;
+    --yad-muted: #6e7681;
+    --yad-border: #373e47;
+    --yad-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    --yad-hover-bg: #2d333b;
+    --yad-accent: #4c8dff;
+    --yad-today-ring: #4c8dff;
+    --yad-weekend: #9198a1;
+  }
+}
+
+:where(.yad.yad--dark) {
+  --yad-bg: #1c2128;
+  --yad-fg: #e6edf3;
+  --yad-muted: #6e7681;
+  --yad-border: #373e47;
+  --yad-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --yad-hover-bg: #2d333b;
+  --yad-accent: #4c8dff;
+  --yad-today-ring: #4c8dff;
+  --yad-weekend: #9198a1;
+}
+
+.yad {
+  box-sizing: border-box;
+  display: inline-block;
+  padding: 10px;
+  font-family: var(--yad-font);
+  font-size: var(--yad-font-size);
+  line-height: 1.2;
+  color: var(--yad-fg);
+  background: var(--yad-bg);
+  border: 1px solid var(--yad-border);
+  border-radius: var(--yad-radius);
+}
+
+.yad *,
+.yad *::before,
+.yad *::after {
+  box-sizing: inherit;
+}
+
+
+
+.yad[hidden] {
+  display: none;
+}
+
+/* Popup */
+.yad--popup {
+  position: absolute;
+  z-index: var(--yad-z);
+  box-shadow: var(--yad-shadow);
+  margin-top: 4px;
+}
+
+.yad--popup.yad--above {
+  margin-top: -4px;
+}
+
+.yad--popup[data-anim='fade'],
+.yad--popup[data-anim='slide'] {
+  opacity: 0;
+  transition: opacity var(--yad-duration) ease, transform var(--yad-duration) ease;
+}
+
+.yad--popup[data-anim='slide'] {
+  transform: translateY(-6px);
+}
+
+.yad--popup.yad--above[data-anim='slide'] {
+  transform: translateY(6px);
+}
+
+.yad--popup.yad--open {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .yad--popup {
+    transition: none !important;
+  }
+}
+
+/* Multiple months */
+.yad-row {
+  display: flex;
+  gap: var(--yad-gap);
+}
+
+.yad-row + .yad-row {
+  margin-top: var(--yad-gap);
+}
+
+/* Header */
+.yad-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.25em;
+  margin-bottom: 6px;
+}
+
+.yad-title {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  font-weight: 600;
+}
+
+.yad-title select {
+  font: inherit;
+  font-weight: 600;
+  color: inherit;
+  background: transparent;
+  border: 1px solid var(--yad-border);
+  border-radius: 4px;
+  padding: 2px 4px;
+}
+
+.yad-title select option {
+  color: var(--yad-fg);
+  background: var(--yad-bg);
+}
+
+.yad-prev,
+.yad-next {
+  position: absolute;
+  top: 50%;
+  width: 2em;
+  height: 2em;
+  padding: 0;
+  transform: translateY(-50%);
+  color: inherit;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.yad-prev { left: 0; }
+.yad-next { right: 0; }
+.yad--rtl .yad-prev { left: auto; right: 0; }
+.yad--rtl .yad-next { right: auto; left: 0; }
+
+.yad-prev:hover:not(:disabled),
+.yad-next:hover:not(:disabled) {
+  background: var(--yad-hover-bg);
+}
+
+.yad-prev:disabled,
+.yad-next:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.yad-icon {
+  display: inline-block;
+  width: 0.5em;
+  height: 0.5em;
+  border: solid currentColor;
+  border-width: 0 0 2px 2px;
+}
+
+.yad-prev .yad-icon { transform: translateX(2px) rotate(45deg); }
+.yad-next .yad-icon { transform: translateX(-2px) rotate(-135deg); }
+.yad--rtl .yad-prev .yad-icon { transform: translateX(-2px) rotate(-135deg); }
+.yad--rtl .yad-next .yad-icon { transform: translateX(2px) rotate(45deg); }
+
+.yad-nav-text {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* Grid */
+.yad-calendar {
+  border-collapse: collapse;
+  border-spacing: 0;
+  margin: 0 auto;
+}
+
+.yad-calendar th {
+  height: 2em;
+  padding: 0;
+  font-size: 0.85em;
+  font-weight: 600;
+  color: var(--yad-muted);
+  text-align: center;
+}
+
+.yad-calendar th abbr {
+  text-decoration: none;
+}
+
+.yad-calendar td {
+  padding: 1px;
+  text-align: center;
+}
+
+.yad-week-col {
+  font-size: 0.8em;
+  color: var(--yad-muted);
+  padding-inline-end: 6px !important;
+}
+
+.yad-day-btn,
+.yad-day-text {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--yad-cell);
+  height: var(--yad-cell);
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+}
+
+.yad-day-btn {
+  cursor: pointer;
+}
+
+.yad-week-end .yad-day-btn {
+  color: var(--yad-weekend);
+}
+
+.yad-other-month .yad-day-btn,
+.yad-other-month .yad-day-text {
+  color: var(--yad-muted);
+  opacity: 0.7;
+}
+
+.yad-day-btn:hover {
+  background: var(--yad-hover-bg);
+}
+
+.yad-highlight .yad-day-btn {
+  background: var(--yad-hover-bg);
+}
+
+.yad-day-btn:focus-visible {
+  outline: 2px solid var(--yad-accent);
+  outline-offset: -2px;
+}
+
+.yad-today .yad-day-btn {
+  box-shadow: inset 0 0 0 1px var(--yad-today-ring);
+  font-weight: 600;
+}
+
+.yad-selected .yad-day-btn,
+.yad-selected .yad-day-btn:hover {
+  color: var(--yad-accent-fg);
+  background: var(--yad-accent);
+}
+
+.yad-unselectable .yad-day-btn {
+  color: var(--yad-muted);
+  opacity: 0.45;
+  cursor: default;
+  text-decoration: line-through;
+}
+
+.yad-unselectable .yad-day-btn:hover {
+  background: transparent;
+}
+
+/* Button pane */
+.yad-buttonpane {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--yad-border);
+}
+
+.yad-buttonpane button {
+  padding: 4px 10px;
+  font: inherit;
+  color: inherit;
+  background: transparent;
+  border: 1px solid var(--yad-border);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.yad-buttonpane button:hover:not(:disabled) {
+  background: var(--yad-hover-bg);
+}
+
+.yad-buttonpane button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.yad-close {
+  font-weight: 600 !important;
+}
+
+/* Disabled */
+.yad--disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* Elements next to the input */
+.yad-append {
+  margin-inline-start: 4px;
+  color: #6e7781;
+  font-size: 0.9em;
+}
+
+.yad-trigger {
+  margin-inline-start: 4px;
+  cursor: pointer;
+}
+
+.yad-trigger--disabled {
+  opacity: 0.5;
+  cursor: default;
+}

@@ -1,0 +1,46 @@
+{
+  "name": "yad",
+  "version": "0.1.0",
+  "description": "Yet Another Datepicker — a dependency-free datepicker with a jQuery UI compatible API",
+  "type": "module",
+  "license": "MIT",
+  "author": "Sandritsch91",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/yad.umd.cjs",
+  "module": "./dist/yad.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/yad.js",
+      "require": "./dist/yad.umd.cjs"
+    },
+    "./yad.css": "./dist/yad.css",
+    "./themes/*": "./dist/themes/*"
+  },
+  "sideEffects": [
+    "*.css"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build && tsc -p tsconfig.build.json && node -e \"require('fs').cpSync('src/themes','dist/themes',{recursive:true})\"",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "datepicker",
+    "date",
+    "calendar",
+    "jquery-ui",
+    "vanilla"
+  ],
+  "devDependencies": {
+    "jsdom": "^31.0.0",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.7",
+    "vitest": "^5.1.0"
+  }
+}

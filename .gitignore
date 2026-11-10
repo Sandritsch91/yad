@@ -1,0 +1,7 @@
+node_modules/
+dist/
+coverage/
+*.log
+.idea/workspace.xml
+.idea/deployment.xml
+.claude/settings.local.json
