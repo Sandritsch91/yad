@@ -20,7 +20,29 @@ import '@sandritsch91/yad/yad.css';
 const dp = new Yad('#date', { dateFormat: 'yy-mm-dd', minDate: 0, maxDate: '+1m' });
 ```
 
-Via `<script>` (UMD): `new yad.Yad('#date', { ... })`.
+### Without a build step
+
+As an ES module:
+
+```html
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@sandritsch91/yad/dist/yad.css">
+<script type="module">
+  import { Yad } from 'https://cdn.jsdelivr.net/npm/@sandritsch91/yad/dist/yad.js';
+  new Yad('#date');
+</script>
+```
+
+As a classic script, which sets `window.yad`:
+
+```html
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@sandritsch91/yad/dist/yad.css">
+<script src="https://cdn.jsdelivr.net/npm/@sandritsch91/yad/dist/yad.umd.js"></script>
+<script>
+  new yad.Yad('#date', { dateFormat: 'dd.mm.yy' });
+</script>
+```
+
+Pin a version in production, e.g. `@sandritsch91/yad@0.1.0`.
 
 | jQuery UI                                   | yad                               |
 |---------------------------------------------|-----------------------------------|

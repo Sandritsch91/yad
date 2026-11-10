@@ -16,14 +16,16 @@
   "files": [
     "dist"
   ],
-  "main": "./dist/yad.umd.cjs",
+  "main": "./dist/yad.cjs",
   "module": "./dist/yad.js",
   "types": "./dist/index.d.ts",
+  "unpkg": "./dist/yad.umd.js",
+  "jsdelivr": "./dist/yad.umd.js",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/yad.js",
-      "require": "./dist/yad.umd.cjs"
+      "require": "./dist/yad.cjs"
     },
     "./yad.css": "./dist/yad.css",
     "./themes/*": "./dist/themes/*"

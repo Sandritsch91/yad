@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>yad: classic script tag</title>
+  <!-- Run `npm run build` first: this page uses the built files, not the sources. -->
+  <link rel="stylesheet" href="../dist/yad.css">
+</head>
+<body>
+  <h1>Classic &lt;script&gt; (UMD) build</h1>
+  <input id="date">
+  <div id="calendar"></div>
+
+  <script src="../dist/yad.umd.js"></script>
+  <script>
+    var Yad = yad.Yad;
+    new Yad('#date', { dateFormat: 'dd.mm.yy' });
+    new Yad('#calendar', Object.assign({}, Yad.regional.fr, { showWeek: true }));
+  </script>
+</body>
+</html>
