@@ -74,3 +74,7 @@ npm run dev      # demo page at http://localhost:5173
 npm test
 npm run build    # dist/: ESM, UMD, CSS, .d.ts
 ```
+
+## License
+
+[MIT](LICENSE)

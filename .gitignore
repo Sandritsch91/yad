@@ -5,3 +5,4 @@ coverage/
 .idea/workspace.xml
 .idea/deployment.xml
 .claude/settings.local.json
+.idea/yiiframeworksettings.xml
