@@ -40,6 +40,14 @@
         <input class="form-control" id="range">
       </div>
       <div class="col-md-6">
+        <label class="form-label" for="from">Date range</label>
+        <div class="input-group">
+          <input class="form-control" id="from" placeholder="From" aria-label="From">
+          <span class="input-group-text">–</span>
+          <input class="form-control" id="to" placeholder="To" aria-label="To">
+        </div>
+      </div>
+      <div class="col-md-6">
         <label class="form-label" for="datetime">Date and time</label>
         <input class="form-control" id="datetime">
       </div>
@@ -87,6 +95,7 @@
     new Yad('#group', { showOn: 'both', buttonText: '📅' });
     new Yad('#full', { changeMonth: true, changeYear: true, showButtonPanel: true, showWeek: true, firstDay: 1 });
     new Yad('#range', { minDate: 0, maxDate: '+2m', beforeShowDay: Yad.noWeekends });
+    Yad.range('#from', '#to', { minDate: 0, numberOfMonths: 2 });
     Yad.datetimepicker('#datetime', { stepMinute: 5 });
     Yad.timepicker('#time', { timeFormat: 'HH:mm', controlType: 'select', stepMinute: 15 });
     new Yad('#inline', { showButtonPanel: true });

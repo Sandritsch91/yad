@@ -59,6 +59,13 @@ Pin a version in production, e.g. `@sandritsch91/yad@1.1.0`.
 | `$.datepicker.formatDate / parseDate`       | `Yad.formatDate / Yad.parseDate`  |
 | `$.datepicker.iso8601Week / noWeekends`     | `Yad.iso8601Week / Yad.noWeekends`|
 
+### Date ranges
+
+```js
+// Two inputs, kept consistent: the end cannot be before the start, the range is highlighted
+const { from, to } = Yad.range('#from', '#to', { minDate: 0, numberOfMonths: 2 });
+```
+
 ### Time picker
 
 Date and time picking modelled on the

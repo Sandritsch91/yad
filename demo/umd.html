@@ -38,6 +38,11 @@
   </section>
 
   <section>
+    <label for="from">Date range</label>
+    <input id="from" aria-label="From"> – <input id="to" aria-label="To">
+  </section>
+
+  <section>
     <label for="datetime">Date and time</label>
     <input id="datetime" size="24">
   </section>
@@ -78,6 +83,9 @@
     var Yad = yad.Yad;
 
     new Yad('#date', { dateFormat: 'dd.mm.yy' });
+
+    // Two linked pickers: the end cannot be before the start, the range is highlighted
+    Yad.range('#from', '#to', { dateFormat: 'dd.mm.yy', numberOfMonths: 2 });
 
     // Date and time: Yad.datetimepicker() is short for new Yad(el, { showTime: true })
     Yad.datetimepicker('#datetime');

@@ -71,6 +71,18 @@
   </section>
 
   <section>
+    <h2>Date range</h2>
+    <input id="from" aria-label="From"> – <input id="to" aria-label="To">
+    <p><code>Yad.range('#from', '#to', { minDate: 0, numberOfMonths: 2 })</code></p>
+  </section>
+
+  <section>
+    <h2>Date and time range</h2>
+    <input id="depart" size="20" aria-label="Departure"> – <input id="return" size="20" aria-label="Return">
+    <p><code>Yad.range('#depart', '#return', { showTime: true, timeFormat: 'HH:mm', stepMinute: 15 })</code></p>
+  </section>
+
+  <section>
     <h2>Date and time</h2>
     <input id="datetime" size="24">
     <p><code>Yad.datetimepicker('#datetime')</code>, or <code>new Yad('#datetime', { showTime: true })</code></p>
@@ -131,6 +143,8 @@
     });
     new Yad('#french', { ...Yad.regional.fr, changeMonth: true, changeYear: true, showButtonPanel: true });
     new Yad('#multi', { numberOfMonths: 3, showCurrentAtPos: 1, showOtherMonths: true });
+    Yad.range('#from', '#to', { minDate: 0, numberOfMonths: 2 });
+    Yad.range('#depart', '#return', { showTime: true, timeFormat: 'HH:mm', stepMinute: 15 });
     Yad.datetimepicker('#datetime');
     new Yad('#datetime2', {
       ...Yad.regional.de, showTime: true, timeFormat: 'HH:mm:ss', stepMinute: 15, hourMin: 8, hourMax: 18,

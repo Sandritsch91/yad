@@ -32,6 +32,7 @@ whatever order the stylesheets load in.
 | `--yad-accent` | `#2563eb` | Selected day, focus outline, time sliders |
 | `--yad-accent-fg` | `#fff` | Text on the selected day |
 | `--yad-today-ring` | `#2563eb` | Ring around today |
+| `--yad-range-bg` | accent at 16% | Days inside a [date range](date-ranges.md) |
 | `--yad-weekend` | `#6e7781` | Weekend day numbers |
 | `--yad-cell` | `2.25em` | Width and height of a day cell |
 | `--yad-gap` | `12px` | Gap between months |
@@ -173,6 +174,8 @@ The root also has `data-anim="fade" | "slide" | "none"` for popups.
 | `.yad-unselectable` | Disabled day |
 | `.yad-today` | Today |
 | `.yad-selected` | Selected day |
+| `.yad-range-start` / `.yad-range-end` | First / last day of a [date range](date-ranges.md) |
+| `.yad-in-range` | Days between the start and end of a range |
 | `.yad-highlight` | Keyboard cursor |
 | `.yad-buttonpane` | Button panel (`.yad-current`, `.yad-close`) |
 

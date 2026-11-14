@@ -17,6 +17,8 @@
   --yad-accent: #2563eb;
   --yad-accent-fg: #fff;
   --yad-today-ring: #2563eb;
+  /* Days between the start and end of a Yad.range() */
+  --yad-range-bg: color-mix(in srgb, var(--yad-accent) 16%, transparent);
   --yad-weekend: #6e7781;
   --yad-cell: 2.25em;
   --yad-gap: 12px;
@@ -293,6 +295,19 @@
 
 .yad-selected .yad-day-btn,
 .yad-selected .yad-day-btn:hover {
+  color: var(--yad-accent-fg);
+  background: var(--yad-accent);
+}
+
+.yad-in-range .yad-day-btn {
+  background: var(--yad-range-bg);
+  border-radius: 0;
+}
+
+.yad-range-start .yad-day-btn,
+.yad-range-start .yad-day-btn:hover,
+.yad-range-end .yad-day-btn,
+.yad-range-end .yad-day-btn:hover {
   color: var(--yad-accent-fg);
   background: var(--yad-accent);
 }

@@ -1,6 +1,7 @@
 import './yad.css';
 
 export { Yad } from './yad';
+export type { YadRange } from './yad';
 export { formatDate, parseDate, iso8601Week, noWeekends, determineDate } from './date-utils';
 export type { FormatSettings, ParseSettings } from './date-utils';
 export { formatTime, parseTime } from './time-utils';

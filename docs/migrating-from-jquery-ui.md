@@ -80,6 +80,15 @@ new Yad('#from', {
 });
 ```
 
+With `Yad.range()` the two pickers are linked for you, so the `onClose` wiring is not needed:
+
+```js
+Yad.setDefaults(de);
+Yad.range('#from', '#to', { minDate: 0, numberOfMonths: 2 });
+```
+
+See [Date ranges](date-ranges.md).
+
 ## Callbacks
 
 Callbacks get the same arguments, except that `inst` is the `Yad` instance (jQuery UI passes an internal

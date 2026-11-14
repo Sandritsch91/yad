@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `Yad.range(from, to, options?)` links a start and an end picker: the end cannot be before the start, the start
+  cannot be after the end (including the time with `showTime`), and both calendars highlight the range
+  (`.yad-range-start`, `.yad-range-end`, `.yad-in-range`, `--yad-range-bg`). See `docs/date-ranges.md`.
+
 ## [1.1.0] - 2026-11-14
 
 > **Note:** this release contains a breaking change (see *Changed*): `en-GB`, `de` and `fr` must now be loaded

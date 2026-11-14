@@ -17,6 +17,12 @@ import { en } from './i18n/en';
 
 type Target = HTMLElement | string;
 
+/** The two pickers of a date range created by {@link Yad.range}. */
+export interface YadRange {
+  from: Yad;
+  to: Yad;
+}
+
 const instances = new WeakMap<HTMLElement, Yad>();
 let uid = 0;
 
@@ -116,6 +122,39 @@ export class Yad {
     return el ? instances.get(el) : undefined;
   }
 
+  /**
+   * Link two pickers into a date range: the end cannot be before the start, the start cannot be after
+   * the end, and both calendars highlight the days in between. `options` apply to both pickers, and
+   * their `minDate`/`maxDate` (or `minDateTime`/`maxDateTime`) limit the whole range.
+   *
+   * ```js
+   * const { from, to } = Yad.range('#from', '#to', { minDate: 0, numberOfMonths: 2 });
+   * ```
+   */
+  static range(from: Target, to: Target, options: Partial<YadOptions> = {}): YadRange {
+    const start = new Yad(from, options);
+    const end = new Yad(to, options);
+    if (start === end) {
+      throw new Error('Yad.range: from and to must be different elements');
+    }
+    start.unlink();
+    end.unlink();
+    start.syncFromInput();
+    end.syncFromInput();
+    start.link = { role: 'start', partner: end };
+    end.link = { role: 'end', partner: start };
+    if (end.inline) {
+      // An inline calendar always starts with a day selected; an end the user has not picked would lock the start.
+      end.selected = null;
+    } else if (start.selected && end.selected && end.selected < start.selected) {
+      // Existing values that contradict each other: move the end up to the start.
+      end.setDateInternal(end.clamp(end.selected), false);
+    }
+    start.refresh();
+    end.refresh();
+    return { from: start, to: end };
+  }
+
   /** Attach to every element matching the selector (like `$(selector).datepicker(options)`). */
   static attach(selector: string | Iterable<HTMLElement>, options: Partial<YadOptions> = {}): Yad[] {
     const elements = typeof selector === 'string'
@@ -139,6 +178,8 @@ export class Yad {
   private hideTimer: ReturnType<typeof setTimeout> | undefined;
   private suppressFocusShow = false;
   private lastDateText = '';
+  /** Set by `Yad.range()`: this picker's side of the range and the other picker. */
+  private link: { role: 'start' | 'end'; partner: Yad } | null = null;
 
   /** Selected date (authoritative for inline instances; mirrors the input otherwise). */
   private selected: Date | null = null;
@@ -396,6 +437,7 @@ export class Yad {
   }
 
   destroy(): void {
+    this.unlink();
     this.hide();
     clearTimeout(this.hideTimer);
     this.container.remove();
@@ -584,6 +626,48 @@ export class Yad {
     return formatDate(format, date, this.formatSettings);
   }
 
+  /** Leave a range created by `Yad.range()`; the other picker becomes independent too. */
+  private unlink(): void {
+    const partner = this.link?.partner;
+    this.link = null;
+    if (partner) {
+      partner.link = null;
+      partner.refresh();
+    }
+  }
+
+  /** The other picker's selection as a bound for this one: its date and, if both have a time, its time. */
+  private get partnerBound(): Date | null {
+    const partner = this.link?.partner;
+    if (!partner?.selected) {
+      return null;
+    }
+    return this.hasTime && partner.hasTime ? withTime(partner.selected, partner.time) : partner.selected;
+  }
+
+  /** `minDateTime`, raised to the start of the range for the end picker. */
+  private get minDateTime(): Date | null {
+    const own = this.settings.minDateTime;
+    const bound = this.link?.role === 'end' ? this.partnerBound : null;
+    return own && bound ? (own > bound ? own : bound) : own ?? bound;
+  }
+
+  /** `maxDateTime`, lowered to the end of the range for the start picker. */
+  private get maxDateTime(): Date | null {
+    const own = this.settings.maxDateTime;
+    const bound = this.link?.role === 'start' ? this.partnerBound : null;
+    return own && bound ? (own < bound ? own : bound) : own ?? bound;
+  }
+
+  /** First and last day of the linked range, for highlighting. */
+  private get rangeDays(): [Date | null, Date | null] {
+    if (!this.link) {
+      return [null, null];
+    }
+    const other = this.link.partner.selected;
+    return this.link.role === 'start' ? [this.selected, other] : [other, this.selected];
+  }
+
   private resolveDate(spec: DateSpec, fallback: Date | null): Date | null {
     return determineDate(spec, fallback, this.settings.dateFormat, this.formatSettings);
   }
@@ -595,7 +679,7 @@ export class Yad {
   /** First selectable day: the later of `minDate` and the day of `minDateTime`. */
   private get minDate(): Date | null {
     const min = this.resolveDate(this.settings.minDate, null);
-    const minDT = this.settings.minDateTime ? stripTime(this.settings.minDateTime) : null;
+    const minDT = this.minDateTime ? stripTime(this.minDateTime) : null;
     return min && minDT ? (min > minDT ? min : minDT) : min ?? minDT;
   }
 
@@ -603,7 +687,7 @@ export class Yad {
   private get maxDate(): Date | null {
     const min = this.minDate;
     let max = this.resolveDate(this.settings.maxDate, null);
-    const maxDT = this.settings.maxDateTime ? stripTime(this.settings.maxDateTime) : null;
+    const maxDT = this.maxDateTime ? stripTime(this.maxDateTime) : null;
     max = max && maxDT ? (max < maxDT ? max : maxDT) : max ?? maxDT;
     return min && max && max < min ? min : max;
   }
@@ -691,7 +775,6 @@ export class Yad {
    * range on their own day; a lower unit is only narrowed while all higher units sit exactly on the bound.
    */
   private timeLimits(unit: TimeUnit, day: Date | null, time: TimeParts): [number, number] {
-    const s = this.settings;
     const { min, max, step } = this.unitConfig(unit);
     let lo = min;
     let hi = max;
@@ -714,8 +797,8 @@ export class Yad {
         }
       }
     };
-    narrow(s.minDateTime, true);
-    narrow(s.maxDateTime, false);
+    narrow(this.minDateTime, true);
+    narrow(this.maxDateTime, false);
     return [snap(lo, lo, hi, min, step), snap(hi, lo, hi, min, step)];
   }
 
@@ -830,6 +913,7 @@ export class Yad {
       }
     }
     this.lastDateText = text;
+    this.link?.partner.refresh();
   }
 
   private dispatchOnInput(...types: string[]): void {
@@ -888,6 +972,7 @@ export class Yad {
     }
     this.updateAltField();
     this.updateTimeDisplay();
+    this.link?.partner.refresh();
   }
 
   /** Update the time readout and slider ranges in place (limits can change with the hour). */
@@ -1243,6 +1328,12 @@ export class Yad {
     if (!enabled) classes.push('yad-unselectable');
     if (isSameDay(date, today)) classes.push('yad-today');
     if (isSelected) classes.push('yad-selected');
+    if (this.link) {
+      const [first, last] = this.rangeDays;
+      if (isSameDay(date, first)) classes.push('yad-range-start');
+      if (isSameDay(date, last)) classes.push('yad-range-end');
+      if (first && last && date > first && date < last) classes.push('yad-in-range');
+    }
     if (isCursor) classes.push('yad-highlight');
     if (extraClass) classes.push(...extraClass.split(/\s+/).filter(Boolean));
 
@@ -1362,6 +1453,7 @@ export class Yad {
       this.moveCursor(parsed.date, true);
       this.lastDateText = this.input.value;
       this.refresh();
+      this.link?.partner.refresh();
     }
   };
 

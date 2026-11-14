@@ -140,6 +140,15 @@ The picker attached to an element (selector or element), or `undefined`.
 Creates a picker for every element matching a selector (or every element of an iterable) and returns them
 as an array, like `$(selector).datepicker(options)`.
 
+### `Yad.range(from, to, options?)`
+
+Creates a start and an end picker and links them: the end cannot be before the start, the start cannot be after
+the end, and both calendars highlight the range. Returns `{ from, to }`. See [Date ranges](date-ranges.md).
+
+```js
+const { from, to } = Yad.range('#from', '#to', { minDate: 0 });
+```
+
 ### `Yad.datetimepicker(target, options?)` / `Yad.timepicker(target, options?)`
 
 Shortcuts for `new Yad(target, { ...options, showTime: true })` and `{ ...options, timeOnly: true }`.

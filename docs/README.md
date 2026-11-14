@@ -13,6 +13,7 @@ yad (Yet Another Datepicker) is a dependency-free date and time picker for the b
 | [Methods](methods.md) | Instance methods, static methods and properties, named exports |
 | [Events and callbacks](events.md) | `onSelect`, `onClose`, `beforeShowDay`, ... and the DOM events yad fires |
 | [Date and time formats](formats.md) | Format tokens, `formatDate` / `parseDate` / `formatTime` / `parseTime`, relative dates |
+| [Date ranges](date-ranges.md) | Linking a start and an end picker with `Yad.range()` |
 | [Time picker](time-picker.md) | Date + time and time-only pickers, steps, ranges, limits |
 | [Localisation](localization.md) | Bundled locales, switching language, writing your own locale |
 | [Theming](theming.md) | CSS custom properties, dark mode, the Bootstrap 5 theme, CSS classes |
