@@ -112,6 +112,8 @@ Demo: `npm run dev`, then open http://localhost:5173/demo/bootstrap5.html.
 
 ### Options
 
+The full reference with types and defaults is in [docs/options.md](docs/options.md).
+
 Same names and semantics as jQuery UI: `altField`, `altFormat`, `appendText`, `autoSize`,
 `beforeShow`, `beforeShowDay`, `buttonImage`, `buttonImageOnly`, `buttonText`, `calculateWeek`,
 `changeMonth`, `changeYear`, `closeText`, `constrainInput`, `currentText`, `dateFormat`, `dayNames`,
@@ -130,6 +132,21 @@ Differences from jQuery UI:
 - Theming uses CSS custom properties (`--yad-accent`, `--yad-bg` and so on). Dark mode follows `prefers-color-scheme`. Add `.yad--light` or `.yad--dark` to the widget to force a mode.
 - Bundled locales: `Yad.regional.en` (also `''` and `'en-US'`, the default), `'en-GB'`, `de` and `fr`. Use one with `Yad.setDefaults(Yad.regional.fr)` or `new Yad(el, { ...Yad.regional.fr })`.
 - The `dialog` method and `showOptions` are not implemented.
+
+## Documentation
+
+Full documentation is in [`docs/`](docs/README.md):
+
+- [Getting started](docs/getting-started.md): installation, ES module / `<script>` / bundler, popup vs. inline
+- [Options](docs/options.md): every option with type, default and description
+- [Methods](docs/methods.md): instance and static methods, named exports
+- [Events and callbacks](docs/events.md): `onSelect`, `onClose`, `beforeShowDay`, DOM events
+- [Date and time formats](docs/formats.md): format tokens, parsing, relative dates
+- [Time picker](docs/time-picker.md): date + time and time-only pickers
+- [Localisation](docs/localization.md): bundled locales and writing your own
+- [Theming](docs/theming.md): CSS custom properties, dark mode, Bootstrap 5, CSS classes
+- [Keyboard and accessibility](docs/keyboard-and-accessibility.md)
+- [Migrating from jQuery UI](docs/migrating-from-jquery-ui.md)
 
 ## Development
 
