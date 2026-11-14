@@ -1,6 +1,9 @@
 /* Yet Another Datepicker. Theme it by overriding the custom properties below, e.g.
    .yad { --yad-accent: hotpink; }  or load a theme file such as themes/bootstrap5.css.
-   Variables are declared in zero-specificity :where() blocks so any .yad rule wins. */
+   Variables are declared in zero-specificity :where() blocks so any .yad rule wins.
+
+   Colour mode: the `theme` option sets data-theme="light" (default), "dark" or "auto" (follow the
+   operating system). The classes .yad--light / .yad--dark force a mode regardless of the option. */
 :where(.yad) {
   --yad-font: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --yad-font-size: 14px;
@@ -19,23 +22,11 @@
   --yad-gap: 12px;
   --yad-duration: 200ms;
   --yad-z: 1000;
+
+  color-scheme: light;
 }
 
-@media (prefers-color-scheme: dark) {
-  :where(.yad:not(.yad--light)) {
-    --yad-bg: #1c2128;
-    --yad-fg: #e6edf3;
-    --yad-muted: #6e7681;
-    --yad-border: #373e47;
-    --yad-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-    --yad-hover-bg: #2d333b;
-    --yad-accent: #4c8dff;
-    --yad-today-ring: #4c8dff;
-    --yad-weekend: #9198a1;
-  }
-}
-
-:where(.yad.yad--dark) {
+:where(.yad[data-theme='dark']:not(.yad--light), .yad.yad--dark) {
   --yad-bg: #1c2128;
   --yad-fg: #e6edf3;
   --yad-muted: #6e7681;
@@ -45,6 +36,24 @@
   --yad-accent: #4c8dff;
   --yad-today-ring: #4c8dff;
   --yad-weekend: #9198a1;
+
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :where(.yad[data-theme='auto']:not(.yad--light)) {
+    --yad-bg: #1c2128;
+    --yad-fg: #e6edf3;
+    --yad-muted: #6e7681;
+    --yad-border: #373e47;
+    --yad-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    --yad-hover-bg: #2d333b;
+    --yad-accent: #4c8dff;
+    --yad-today-ring: #4c8dff;
+    --yad-weekend: #9198a1;
+
+    color-scheme: dark;
+  }
 }
 
 .yad {

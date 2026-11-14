@@ -95,6 +95,8 @@
   <script type="module">
     import { Yad } from './src/index.ts';
     window.Yad = Yad;
+    // This page has a dark mode that follows the system, so the pickers should too.
+    Yad.setDefaults({ theme: 'auto' });
 
     new Yad('#basic');
     new Yad('#full', { changeMonth: true, changeYear: true, showButtonPanel: true, showWeek: true, firstDay: 1 });

@@ -25,7 +25,7 @@ Several options take a **date spec** (`DateSpec`). Wherever you see that type, y
 **Contents:** [Date format and value](#date-format-and-value) ·
 [Selectable range](#selectable-range) · [Calendar layout](#calendar-layout) ·
 [Navigation](#navigation) · [Button panel](#button-panel) · [Input and trigger](#input-and-trigger) ·
-[Alternative field](#alternative-field) · [Animation](#animation) · [Callbacks](#callbacks) ·
+[Alternative field](#alternative-field) · [Appearance](#appearance) · [Animation](#animation) · [Callbacks](#callbacks) ·
 [Locale texts](#locale-texts) · [Time picker](#time-picker)
 
 ## Date format and value
@@ -135,6 +135,12 @@ restores the previous `autocomplete` value.
   new Yad('#date', { dateFormat: 'DD, d MM yy', altField: '#date-iso', altFormat: 'yy-mm-dd' });
 </script>
 ```
+
+## Appearance
+
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `theme` | `'light' \| 'dark' \| 'auto'` | `'light'` | Colour mode. `'auto'` follows the operating system's dark-mode setting. See [Theming](theming.md#dark-mode). |
 
 ## Animation
 

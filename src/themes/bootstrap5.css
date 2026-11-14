@@ -28,6 +28,8 @@
   --yad-gap: 1rem;
   /* Above dropdowns/modals so the picker also works inside a .modal */
   --yad-z: 1070;
+  /* Colours follow Bootstrap's colour mode (data-bs-theme), not yad's theme option */
+  color-scheme: inherit;
 
   padding: 0.5rem;
   line-height: var(--bs-body-line-height, 1.5);

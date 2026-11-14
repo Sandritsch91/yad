@@ -49,6 +49,9 @@ export interface RegionalSettings extends Partial<TimeRegionalSettings> {
 
 export type TimeControlType = 'slider' | 'select';
 
+/** Colour mode: always light, always dark, or follow the operating system. */
+export type YadTheme = 'light' | 'dark' | 'auto';
+
 export interface YadOptions extends Required<RegionalSettings> {
   /** Selector or element of an input to also receive the selected date (in `altFormat`). */
   altField: string | HTMLInputElement | null;
@@ -95,6 +98,8 @@ export interface YadOptions extends Required<RegionalSettings> {
   stepMonths: number;
   /** Range of years in the year dropdown, e.g. "c-10:c+10", "-nn:+nn", "nnnn:nnnn". */
   yearRange: string;
+  /** Colour mode: 'light' (default), 'dark', or 'auto' to follow the operating system setting. */
+  theme: YadTheme;
 
   // --- Time picker (option names follow the jQuery UI Timepicker addon) ---------------------------
 
@@ -176,6 +181,7 @@ export const BASE_DEFAULTS: Omit<YadOptions, keyof RegionalSettings> = {
   showWeek: false,
   stepMonths: 1,
   yearRange: 'c-10:c+10',
+  theme: 'light',
   showTime: false,
   timeOnly: false,
   separator: ' ',

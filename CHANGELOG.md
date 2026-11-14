@@ -20,6 +20,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `millisecText`, `nowText`, `amNames`, `pmNames` and `timeFormat`.
 - Time picker styles in the base stylesheet and the Bootstrap 5 theme.
 - `CHANGELOG.md` is included in the npm package.
+- `theme` option: `'light'` (default), `'dark'` or `'auto'` (follow the operating system). The browser's own
+  controls inside the picker follow it through CSS `color-scheme`.
+
+### Changed
+
+- **Breaking:** the picker no longer turns dark automatically when the operating system is in dark mode, which
+  made it dark on light pages. It is light by default; use `theme: 'auto'` for the previous behaviour.
+  The `yad--dark` and `yad--light` classes still force a mode.
+
+### Fixed
+
+- Time formats: `''` inside a quoted literal now produces a quote, as in date formats.
 
 ## [0.1.1] - 2026-11-10
 

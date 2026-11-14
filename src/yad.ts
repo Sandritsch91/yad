@@ -1012,6 +1012,7 @@ export class Yad {
       : undefined;
 
     this.container.dir = s.isRTL ? 'rtl' : 'ltr';
+    this.container.dataset.theme = s.theme;
     this.container.classList.toggle('yad--rtl', s.isRTL);
     this.container.classList.toggle('yad--multi', !s.timeOnly && rows * cols > 1);
     this.container.classList.toggle('yad--time', this.hasTime);

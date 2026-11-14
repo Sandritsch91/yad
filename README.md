@@ -129,7 +129,7 @@ Differences from jQuery UI:
 - Selecting a date always dispatches `input` and `change` events on the input (jQuery UI only fires `change` when there is no `onSelect`).
 - Day cells are buttons in an ARIA grid. When focus is in the calendar, the arrow keys, Home/End, PageUp/PageDown (Shift for a year), Enter/Space and Escape work.
 - jQuery UI's keyboard shortcuts on the input also work: Ctrl+arrows, PageUp/PageDown, Ctrl+Home, Ctrl+End and Enter. ArrowDown moves focus into the calendar.
-- Theming uses CSS custom properties (`--yad-accent`, `--yad-bg` and so on). Dark mode follows `prefers-color-scheme`. Add `.yad--light` or `.yad--dark` to the widget to force a mode.
+- Theming uses CSS custom properties (`--yad-accent`, `--yad-bg` and so on). The picker is light by default; `theme: 'dark'` makes it dark and `theme: 'auto'` follows the operating system.
 - Bundled locales: `Yad.regional.en` (also `''` and `'en-US'`, the default), `'en-GB'`, `de` and `fr`. Use one with `Yad.setDefaults(Yad.regional.fr)` or `new Yad(el, { ...Yad.regional.fr })`.
 - The `dialog` method and `showOptions` are not implemented.
 

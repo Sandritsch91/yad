@@ -6,7 +6,7 @@ export type { FormatSettings, ParseSettings } from './date-utils';
 export { formatTime, parseTime } from './time-utils';
 export type { TimeParts, TimeSettings } from './time-utils';
 export type {
-  YadOptions, RegionalSettings, TimeRegionalSettings, TimeControlType, DateSpec, BeforeShowDayResult,
+  YadOptions, RegionalSettings, TimeRegionalSettings, TimeControlType, YadTheme, DateSpec, BeforeShowDayResult,
 } from './options';
 export { de } from './i18n/de';
 export { en, enGB } from './i18n/en';

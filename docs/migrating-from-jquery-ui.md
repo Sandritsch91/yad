@@ -99,7 +99,7 @@ onSelect(dateText, inst) { inst.input.blur(); }
 | Keyboard | Ctrl shortcuts in the input | The same, plus arrow-key navigation inside the calendar grid ([Keyboard](keyboard-and-accessibility.md)) |
 | Markup | `<a>` elements in a table | `<button>` elements in an ARIA grid |
 | Styling | jQuery UI ThemeRoller (`ui-datepicker-*` classes) | CSS custom properties and `yad-*` classes ([Theming](theming.md)) |
-| Dark mode | Separate theme | Automatic |
+| Dark mode | Separate theme | `theme: 'dark'` or `'auto'` (follows the operating system) |
 | Modals | Popup appended to `<body>` | Mounted inside the enclosing modal or `<dialog>` |
 | `showAnim` | Any jQuery UI effect | `'fade'`, `'slide'` or `'none'` |
 | `showOptions` | Effect options | Not supported |

@@ -177,7 +177,7 @@ The ES module and CommonJS builds export:
 | `determineDate(spec, fallback, format?, settings?)` | Resolves a [date spec](options.md) to a `Date` (or `fallback`). |
 | `en`, `enGB`, `de`, `fr` | The locale objects. |
 
-TypeScript types: `YadOptions`, `RegionalSettings`, `TimeRegionalSettings`, `TimeControlType`, `DateSpec`,
+TypeScript types: `YadOptions`, `RegionalSettings`, `TimeRegionalSettings`, `TimeControlType`, `YadTheme`, `DateSpec`,
 `BeforeShowDayResult`, `FormatSettings`, `ParseSettings`, `TimeParts`, `TimeSettings`.
 
 The UMD build exposes the same names on `window.yad` (`yad.Yad`, `yad.formatDate`, `yad.de`, ...).

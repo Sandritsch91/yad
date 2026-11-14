@@ -53,15 +53,32 @@ dp.widget().classList.add('brand-picker');
 
 ## Dark mode
 
-yad follows the operating system setting (`prefers-color-scheme: dark`) automatically. To force a mode,
-add a class to the widget:
+The picker is **light by default**, whatever the operating system setting. Choose the mode with the
+`theme` option:
+
+| `theme` | Result |
+|---|---|
+| `'light'` (default) | Always light |
+| `'dark'` | Always dark |
+| `'auto'` | Follows the operating system (`prefers-color-scheme`). Use it when your page has a dark mode that also follows the system. |
 
 ```js
-dp.widget().classList.add('yad--dark');    // always dark
-dp.widget().classList.add('yad--light');   // always light, even in dark mode
+new Yad('#date', { theme: 'auto' });
+Yad.setDefaults({ theme: 'auto' });    // for every picker
+dp.option('theme', 'dark');            // switch later
 ```
 
-To follow a dark-mode switch of your own (e.g. a `.dark` class on `<html>`):
+The mode is written to the widget as `data-theme="light" | "dark" | "auto"`, and the browser's own
+controls inside the picker (dropdown menus, sliders) follow it through CSS `color-scheme`.
+
+The classes `yad--dark` and `yad--light` on the widget force a mode regardless of the option:
+
+```js
+dp.widget().classList.add('yad--dark');
+```
+
+To follow a dark-mode switch of your own (e.g. a `.dark` class on `<html>`), either call
+`dp.option('theme', …)` when it changes, or set the colours in CSS:
 
 ```css
 html.dark .yad {
@@ -95,7 +112,8 @@ import '@sandritsch91/yad/themes/bootstrap5.css';
 The theme:
 
 - takes colours, radii, focus rings and shadows from Bootstrap's CSS variables, so a customised `$primary`
-  and colour modes (`data-bs-theme="dark"`) apply automatically
+  and colour modes (`data-bs-theme="dark"`) apply automatically. The `theme` option has no effect with it:
+  Bootstrap's colour mode decides
 - styles the dropdowns like `.form-select-sm`, the buttons like `.btn-sm`, and the trigger button like
   `.btn-outline-secondary`
 - works inside an `.input-group`:
@@ -134,6 +152,7 @@ Use these to fine-tune the styling.
 | `.yad--disabled` | Picker is disabled |
 | `.yad--time` / `.yad--time-only` | Time picker enabled / time only |
 | `.yad--light` / `.yad--dark` | Forced colour mode (you add these) |
+| `[data-theme]` | `light`, `dark` or `auto`, from the `theme` option |
 
 The root also has `data-anim="fade" | "slide" | "none"` for popups.
 

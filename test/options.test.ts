@@ -357,3 +357,36 @@ describe('enable / disable', () => {
     expect(q<HTMLSelectElement>(dp, '.yad-year-select')!.disabled).toBe(true);
   });
 });
+
+describe('theme', () => {
+  it('is light by default', () => {
+    html('<div id="cal"></div>');
+    const dp = create('#cal');
+    expect(dp.option('theme')).toBe('light');
+    expect(dp.widget().dataset.theme).toBe('light');
+  });
+
+  it.each([['dark'], ['auto']] as const)('can be set to %s', (theme) => {
+    html('<input id="date">');
+    const dp = create('#date', { theme });
+    dp.show();
+    expect(dp.widget().dataset.theme).toBe(theme);
+  });
+
+  it('can be changed later and set as a default', () => {
+    html('<div id="cal"></div><div id="cal2"></div>');
+    const dp = create('#cal');
+    dp.option('theme', 'dark');
+    expect(dp.widget().dataset.theme).toBe('dark');
+    Yad.setDefaults({ theme: 'auto' });
+    expect(create('#cal2').widget().dataset.theme).toBe('auto');
+  });
+
+  it('keeps classes added by the page', () => {
+    html('<div id="cal"></div>');
+    const dp = create('#cal');
+    dp.widget().classList.add('yad--dark');
+    dp.option('theme', 'auto');
+    expect(dp.widget().classList.contains('yad--dark')).toBe(true);
+  });
+});
