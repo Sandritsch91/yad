@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-11-14
+
+> **Note:** this release contains a breaking change (see *Changed*): `en-GB`, `de` and `fr` must now be loaded
+> like every other locale. It is released as a minor version because 1.0.0 was only available for about an hour.
+
 ### Added
 
 - 78 more locales, for 82 in total: Afrikaans, Albanian, Arabic, Armenian, Azerbaijani, Basque, Belarusian, Bengali,
@@ -94,7 +99,8 @@ First stable release.
 - ES module and UMD builds with TypeScript type definitions.
 - GitHub Actions workflow running the type check, tests and build on Node 22, 24 and 26.
 
-[Unreleased]: https://github.com/Sandritsch91/yad/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/Sandritsch91/yad/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/Sandritsch91/yad/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/Sandritsch91/yad/compare/v0.1.1...v1.0.0
 [0.1.1]: https://github.com/Sandritsch91/yad/compare/22d5295...v0.1.1
 [0.1.0]: https://github.com/Sandritsch91/yad/commits/22d5295

@@ -1,6 +1,6 @@
 {
   "name": "@sandritsch91/yad",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Yet Another Datepicker — a dependency-free datepicker with a jQuery UI compatible API",
   "type": "module",
   "license": "MIT",

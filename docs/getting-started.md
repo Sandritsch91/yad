@@ -32,12 +32,12 @@ The package ships:
 ### Without a build step: ES module from a CDN
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@sandritsch91/yad@1.0.0/dist/yad.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@sandritsch91/yad@1.1.0/dist/yad.css">
 
 <input id="date">
 
 <script type="module">
-  import { Yad } from 'https://cdn.jsdelivr.net/npm/@sandritsch91/yad@1.0.0/dist/yad.js';
+  import { Yad } from 'https://cdn.jsdelivr.net/npm/@sandritsch91/yad@1.1.0/dist/yad.js';
   new Yad('#date');
 </script>
 ```
@@ -47,8 +47,8 @@ The package ships:
 The UMD build puts everything on the global `yad` object:
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@sandritsch91/yad@1.0.0/dist/yad.css">
-<script src="https://cdn.jsdelivr.net/npm/@sandritsch91/yad@1.0.0/dist/yad.umd.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@sandritsch91/yad@1.1.0/dist/yad.css">
+<script src="https://cdn.jsdelivr.net/npm/@sandritsch91/yad@1.1.0/dist/yad.umd.js"></script>
 
 <input id="date">
 
@@ -58,7 +58,7 @@ The UMD build puts everything on the global `yad` object:
 </script>
 ```
 
-Pin an exact version (`@1.0.0`) in production so an update cannot change your page unexpectedly.
+Pin an exact version (`@1.1.0`) in production so an update cannot change your page unexpectedly.
 
 > **ES modules need a web server.** Browsers block `<script type="module">` on pages opened from disk
 > (`file://`), and some web servers send `.ts` or unknown files with the wrong type. Serve the page over HTTP,

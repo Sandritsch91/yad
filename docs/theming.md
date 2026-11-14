@@ -105,8 +105,8 @@ import '@sandritsch91/yad/themes/bootstrap5.css';
 
 ```html
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@sandritsch91/yad@1.0.0/dist/yad.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@sandritsch91/yad@1.0.0/dist/themes/bootstrap5.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@sandritsch91/yad@1.1.0/dist/yad.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@sandritsch91/yad@1.1.0/dist/themes/bootstrap5.css">
 ```
 
 The theme:
