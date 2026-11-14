@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-11-14
+
 ### Added
 
 - `Yad.range(from, to, options?)` links a start and an end picker: the end cannot be before the start, the start
@@ -105,7 +107,8 @@ First stable release.
 - ES module and UMD builds with TypeScript type definitions.
 - GitHub Actions workflow running the type check, tests and build on Node 22, 24 and 26.
 
-[Unreleased]: https://github.com/Sandritsch91/yad/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/Sandritsch91/yad/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/Sandritsch91/yad/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/Sandritsch91/yad/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/Sandritsch91/yad/compare/v0.1.1...v1.0.0
 [0.1.1]: https://github.com/Sandritsch91/yad/compare/22d5295...v0.1.1
