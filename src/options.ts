@@ -7,8 +7,29 @@ export type DateSpec = Date | number | string | null;
 /** Return value of `beforeShowDay`: [selectable, cssClass?, tooltip?] */
 export type BeforeShowDayResult = [boolean, string?, string?];
 
-/** Texts and conventions that differ by locale (jQuery UI's "regional" settings). */
-export interface RegionalSettings {
+/** Locale texts for the time picker (the timepicker addon's regional settings). */
+export interface TimeRegionalSettings {
+  /** Header shown when `timeOnly` is set. */
+  timeOnlyTitle: string;
+  timeText: string;
+  hourText: string;
+  minuteText: string;
+  secondText: string;
+  millisecText: string;
+  /** Label of the button that selects the current date and time (replaces `currentText` when time is shown). */
+  nowText: string;
+  /** Names accepted for AM; the first one is used when formatting. */
+  amNames: string[];
+  /** Names accepted for PM; the first one is used when formatting. */
+  pmNames: string[];
+  timeFormat: string;
+}
+
+/**
+ * Texts and conventions that differ by locale (jQuery UI's "regional" settings). The time texts are
+ * optional so locales written for date-only use keep working; missing ones fall back to English.
+ */
+export interface RegionalSettings extends Partial<TimeRegionalSettings> {
   closeText: string;
   prevText: string;
   nextText: string;
@@ -26,7 +47,9 @@ export interface RegionalSettings {
   yearSuffix: string;
 }
 
-export interface YadOptions extends RegionalSettings {
+export type TimeControlType = 'slider' | 'select';
+
+export interface YadOptions extends Required<RegionalSettings> {
   /** Selector or element of an input to also receive the selected date (in `altFormat`). */
   altField: string | HTMLInputElement | null;
   altFormat: string;
@@ -72,10 +95,51 @@ export interface YadOptions extends RegionalSettings {
   stepMonths: number;
   /** Range of years in the year dropdown, e.g. "c-10:c+10", "-nn:+nn", "nnnn:nnnn". */
   yearRange: string;
+
+  // --- Time picker (option names follow the jQuery UI Timepicker addon) ---------------------------
+
+  /** Add time selection below the calendar (a date + time picker). */
+  showTime: boolean;
+  /** Show only the time controls, no calendar. */
+  timeOnly: boolean;
+  /** Text between the date and the time in the input. */
+  separator: string;
+  /** Use range sliders or dropdowns for the time units. */
+  controlType: TimeControlType;
+  /** Show the unit's control. `null` decides from `timeFormat` (e.g. seconds only when it contains `s`). */
+  showHour: boolean | null;
+  showMinute: boolean | null;
+  showSecond: boolean | null;
+  showMillisec: boolean | null;
+  stepHour: number;
+  stepMinute: number;
+  stepSecond: number;
+  stepMillisec: number;
+  hourMin: number;
+  hourMax: number;
+  minuteMin: number;
+  minuteMax: number;
+  secondMin: number;
+  secondMax: number;
+  millisecMin: number;
+  millisecMax: number;
+  /** Initial time when no value is set. */
+  hour: number;
+  minute: number;
+  second: number;
+  millisec: number;
+  /** Earliest selectable date and time. Also limits the selectable days like `minDate`. */
+  minDateTime: Date | null;
+  /** Latest selectable date and time. Also limits the selectable days like `maxDate`. */
+  maxDateTime: Date | null;
+  /** Format of the time written to `altField` (defaults to `timeFormat`). */
+  altTimeFormat: string;
+  /** Text between date and time in `altField` (defaults to `separator`). */
+  altSeparator: string;
 }
 
 /** Default localisation (English, US). */
-export const REGIONAL_EN: RegionalSettings = en;
+export const REGIONAL_EN: Required<RegionalSettings> = en;
 
 export const BASE_DEFAULTS: Omit<YadOptions, keyof RegionalSettings> = {
   altField: null,
@@ -112,4 +176,32 @@ export const BASE_DEFAULTS: Omit<YadOptions, keyof RegionalSettings> = {
   showWeek: false,
   stepMonths: 1,
   yearRange: 'c-10:c+10',
+  showTime: false,
+  timeOnly: false,
+  separator: ' ',
+  controlType: 'slider',
+  showHour: null,
+  showMinute: null,
+  showSecond: null,
+  showMillisec: null,
+  stepHour: 1,
+  stepMinute: 1,
+  stepSecond: 1,
+  stepMillisec: 1,
+  hourMin: 0,
+  hourMax: 23,
+  minuteMin: 0,
+  minuteMax: 59,
+  secondMin: 0,
+  secondMax: 59,
+  millisecMin: 0,
+  millisecMax: 999,
+  hour: 0,
+  minute: 0,
+  second: 0,
+  millisec: 0,
+  minDateTime: null,
+  maxDateTime: null,
+  altTimeFormat: '',
+  altSeparator: '',
 };

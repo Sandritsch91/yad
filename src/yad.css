@@ -299,6 +299,61 @@
   background: transparent;
 }
 
+/* Time picker */
+.yad-time {
+  display: grid;
+  gap: 6px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--yad-border);
+}
+
+.yad--time-only .yad-time {
+  min-width: 15em;
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.yad-time-row {
+  display: grid;
+  grid-template-columns: minmax(4.5em, auto) 1fr;
+  align-items: center;
+  gap: 8px;
+}
+
+.yad-time-label {
+  font-size: 0.9em;
+  color: var(--yad-muted);
+}
+
+.yad-time-value {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.yad-time-slider {
+  width: 100%;
+  margin: 0;
+  accent-color: var(--yad-accent);
+}
+
+.yad-time-select {
+  justify-self: start;
+  padding: 2px 4px;
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  color: inherit;
+  background: transparent;
+  border: 1px solid var(--yad-border);
+  border-radius: 4px;
+}
+
+.yad-time-select option {
+  color: var(--yad-fg);
+  background: var(--yad-bg);
+}
+
 /* Button pane */
 .yad-buttonpane {
   display: flex;

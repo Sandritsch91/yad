@@ -33,6 +33,14 @@
         <input class="form-control" id="range">
       </div>
       <div class="col-md-6">
+        <label class="form-label" for="datetime">Date and time</label>
+        <input class="form-control" id="datetime">
+      </div>
+      <div class="col-md-6">
+        <label class="form-label" for="time">Time only, dropdowns</label>
+        <input class="form-control" id="time">
+      </div>
+      <div class="col-md-6">
         <label class="form-label">Inline</label>
         <div id="inline"></div>
       </div>
@@ -72,6 +80,8 @@
     new Yad('#group', { showOn: 'both', buttonText: '📅' });
     new Yad('#full', { changeMonth: true, changeYear: true, showButtonPanel: true, showWeek: true, firstDay: 1 });
     new Yad('#range', { minDate: 0, maxDate: '+2m', beforeShowDay: Yad.noWeekends });
+    Yad.datetimepicker('#datetime', { stepMinute: 5 });
+    Yad.timepicker('#time', { timeFormat: 'HH:mm', controlType: 'select', stepMinute: 15 });
     new Yad('#inline', { showButtonPanel: true });
     new Yad('#in-modal', { showButtonPanel: true });
 

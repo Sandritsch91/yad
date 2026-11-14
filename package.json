@@ -14,7 +14,8 @@
     "url": "https://github.com/Sandritsch91/yad/issues"
   },
   "files": [
-    "dist"
+    "dist",
+    "CHANGELOG.md"
   ],
   "main": "./dist/yad.cjs",
   "module": "./dist/yad.js",

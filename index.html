@@ -56,6 +56,30 @@
     <p><code>{ numberOfMonths: 3, showCurrentAtPos: 1, showOtherMonths: true }</code></p>
   </section>
 
+  <section>
+    <h2>Date and time</h2>
+    <input id="datetime" size="24">
+    <p><code>Yad.datetimepicker('#datetime')</code>, or <code>new Yad('#datetime', { showTime: true })</code></p>
+  </section>
+
+  <section>
+    <h2>Time with seconds, 15-minute steps, office hours, dropdowns</h2>
+    <input id="datetime2" size="24">
+    <p><code>{ ...Yad.regional.de, showTime: true, timeFormat: 'HH:mm:ss', stepMinute: 15, hourMin: 8, hourMax: 18, controlType: 'select' }</code></p>
+  </section>
+
+  <section>
+    <h2>Time only</h2>
+    <input id="time">
+    <p><code>Yad.timepicker('#time', { timeFormat: 'HH:mm' })</code></p>
+  </section>
+
+  <section>
+    <h2>Earliest: today 14:30, latest: in 3 days 18:00</h2>
+    <input id="bounded" size="24">
+    <p><code>{ showTime: true, minDateTime, maxDateTime }</code></p>
+  </section>
+
   <section class="row">
     <div>
       <h2>Inline</h2>
@@ -80,6 +104,15 @@
     });
     new Yad('#french', { ...Yad.regional.fr, changeMonth: true, changeYear: true, showButtonPanel: true });
     new Yad('#multi', { numberOfMonths: 3, showCurrentAtPos: 1, showOtherMonths: true });
+    Yad.datetimepicker('#datetime');
+    new Yad('#datetime2', {
+      ...Yad.regional.de, showTime: true, timeFormat: 'HH:mm:ss', stepMinute: 15, hourMin: 8, hourMax: 18,
+      controlType: 'select',
+    });
+    Yad.timepicker('#time', { timeFormat: 'HH:mm' });
+    const min = new Date(); min.setHours(14, 30, 0, 0);
+    const max = new Date(); max.setDate(max.getDate() + 3); max.setHours(18, 0, 0, 0);
+    new Yad('#bounded', { showTime: true, timeFormat: 'HH:mm', minDateTime: min, maxDateTime: max });
     new Yad('#inline', {
       dateFormat: 'DD, d MM yy',
       onSelect: (text) => { document.getElementById('inline-out').textContent = text; },

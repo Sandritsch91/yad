@@ -6,17 +6,72 @@
   <title>yad: classic script tag</title>
   <!-- Run `npm run build` first: this page uses the built files, not the sources. -->
   <link rel="stylesheet" href="../dist/yad.css">
+  <style>
+    body { font: 15px/1.5 system-ui, sans-serif; max-width: 760px; margin: 0 auto; padding: 24px 16px 120px; }
+    section { margin: 24px 0; }
+    label { display: block; font-weight: 600; margin-bottom: 4px; }
+    input { font: inherit; padding: 6px 8px; }
+  </style>
 </head>
 <body>
   <h1>Classic &lt;script&gt; (UMD) build</h1>
-  <input id="date">
-  <div id="calendar"></div>
+
+  <section>
+    <label for="date">Date</label>
+    <input id="date">
+  </section>
+
+  <section>
+    <label for="datetime">Date and time</label>
+    <input id="datetime" size="24">
+  </section>
+
+  <section>
+    <label for="datetime-de">Date and time (German, seconds, 15-minute steps, dropdowns)</label>
+    <input id="datetime-de" size="24">
+  </section>
+
+  <section>
+    <label for="time">Time only</label>
+    <input id="time">
+  </section>
+
+  <section>
+    <label>Inline (French)</label>
+    <div id="calendar"></div>
+  </section>
+
+  <section>
+    <label>Inline date and time</label>
+    <div id="calendar-time"></div>
+  </section>
 
   <script src="../dist/yad.umd.js"></script>
   <script>
     var Yad = yad.Yad;
+
     new Yad('#date', { dateFormat: 'dd.mm.yy' });
+
+    // Date and time: Yad.datetimepicker() is short for new Yad(el, { showTime: true })
+    Yad.datetimepicker('#datetime');
+
+    new Yad('#datetime-de', Object.assign({}, Yad.regional.de, {
+      showTime: true,
+      timeFormat: 'HH:mm:ss',
+      stepMinute: 15,
+      controlType: 'select'
+    }));
+
+    // Time only: Yad.timepicker() is short for new Yad(el, { timeOnly: true })
+    Yad.timepicker('#time', { timeFormat: 'HH:mm', stepMinute: 5 });
+
     new Yad('#calendar', Object.assign({}, Yad.regional.fr, { showWeek: true }));
+
+    new Yad('#calendar-time', {
+      showTime: true,
+      timeFormat: 'HH:mm',
+      onSelect: function (text) { console.log('selected', text); }
+    });
   </script>
 </body>
 </html>

@@ -61,8 +61,9 @@
   box-shadow: 0 0 0 var(--bs-focus-ring-width, 0.25rem) var(--bs-focus-ring-color, rgba(13, 110, 253, 0.25));
 }
 
-/* Month / year dropdowns: look like .form-select.form-select-sm */
-.yad-title select {
+/* Month / year / time dropdowns: look like .form-select.form-select-sm */
+.yad-title select,
+.yad-time-select {
   appearance: none;
   padding: 0.25rem 1.75rem 0.25rem 0.5rem;
   font-weight: 500;
@@ -78,15 +79,34 @@
   border-radius: var(--bs-border-radius-sm, 0.25rem);
 }
 
-.yad--rtl .yad-title select {
+.yad--rtl .yad-title select,
+.yad--rtl .yad-time-select {
   padding: 0.25rem 0.5rem 0.25rem 1.75rem;
   background-position: left 0.5rem center;
 }
 
-.yad-title select:focus {
+.yad-title select:focus,
+.yad-time-select:focus {
   border-color: rgba(var(--bs-primary-rgb, 13, 110, 253), 0.5);
   outline: 0;
   box-shadow: 0 0 0 var(--bs-focus-ring-width, 0.25rem) var(--bs-focus-ring-color, rgba(13, 110, 253, 0.25));
+}
+
+/* Time picker: sliders take the primary colour like .form-range */
+.yad-time {
+  border-top-color: var(--bs-border-color-translucent, rgba(0, 0, 0, 0.175));
+}
+
+.yad-time-label {
+  color: var(--bs-secondary-color, rgba(33, 37, 41, 0.75));
+}
+
+.yad-time-value {
+  font-weight: 500;
+}
+
+.yad-time-slider {
+  accent-color: var(--bs-primary, #0d6efd);
 }
 
 /* Day grid */

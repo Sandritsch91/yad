@@ -59,6 +59,42 @@ Pin a version in production, e.g. `@sandritsch91/yad@0.1.0`.
 | `$.datepicker.formatDate / parseDate`       | `Yad.formatDate / Yad.parseDate`  |
 | `$.datepicker.iso8601Week / noWeekends`     | `Yad.iso8601Week / Yad.noWeekends`|
 
+### Time picker
+
+Date and time picking modelled on the
+[jQuery UI Timepicker addon](https://trentrichardson.com/examples/timepicker/), built in:
+
+```js
+Yad.datetimepicker('#when');                    // = new Yad('#when', { showTime: true })
+Yad.timepicker('#at', { timeFormat: 'HH:mm' }); // = new Yad('#at', { timeOnly: true, ... })
+
+new Yad('#meeting', {
+  showTime: true,
+  timeFormat: 'HH:mm',          // tokens: H HH h hh m mm s ss l t T tt TT
+  stepMinute: 15,
+  hourMin: 8,
+  hourMax: 18,
+  controlType: 'select',        // or 'slider' (default)
+  minDateTime: new Date(2026, 10, 20, 9, 30),
+});
+
+dp.getDate();                   // Date including the time
+dp.setDate(new Date(2026, 10, 20, 14, 30));
+Yad.formatTime('hh:mm TT', { hour: 14, minute: 30 }); // "02:30 PM"
+Yad.parseTime('HH:mm', '14:30');                      // { hour: 14, minute: 30, second: 0, millisec: 0 }
+```
+
+With the time picker, selecting a day keeps the popup open. **Now** selects the current date and time,
+and **Done** or clicking outside closes it.
+
+Time options: `showTime`, `timeOnly`, `timeFormat`, `separator`, `controlType`, `showHour`,
+`showMinute`, `showSecond`, `showMillisec` (`null` = decided by `timeFormat`), `stepHour`, `stepMinute`,
+`stepSecond`, `stepMillisec`, `hourMin`/`hourMax` (and the minute, second and millisecond equivalents),
+`hour`, `minute`, `second`, `millisec` (initial time), `minDateTime`, `maxDateTime`, `altTimeFormat`,
+`altSeparator`. The locale texts `timeOnlyTitle`, `timeText`, `hourText`, `minuteText`, `secondText`,
+`millisecText`, `nowText`, `amNames`, `pmNames` and `timeFormat` are part of `Yad.regional`. The default
+English locale uses 12-hour time (`hh:mm TT`). `en-GB`, `de` and `fr` use 24-hour time (`HH:mm`).
+
 ### Themes
 
 Override the CSS custom properties (`.yad { --yad-accent: hotpink; }`) or load a bundled theme after `yad.css`:

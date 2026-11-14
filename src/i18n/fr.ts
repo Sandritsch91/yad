@@ -1,7 +1,7 @@
 import type { RegionalSettings } from '../options';
 
 /** French. */
-export const fr: RegionalSettings = {
+export const fr: Required<RegionalSettings> = {
   closeText: 'Fermer',
   prevText: 'Précédent',
   nextText: 'Suivant',
@@ -19,4 +19,14 @@ export const fr: RegionalSettings = {
   isRTL: false,
   showMonthAfterYear: false,
   yearSuffix: '',
+  timeOnlyTitle: 'Choisir une heure',
+  timeText: 'Heure',
+  hourText: 'Heures',
+  minuteText: 'Minutes',
+  secondText: 'Secondes',
+  millisecText: 'Millisecondes',
+  nowText: 'Maintenant',
+  amNames: ['AM', 'A'],
+  pmNames: ['PM', 'P'],
+  timeFormat: 'HH:mm',
 };

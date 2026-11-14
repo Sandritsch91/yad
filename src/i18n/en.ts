@@ -1,7 +1,7 @@
 import type { RegionalSettings } from '../options';
 
 /** English (US). This is the default localisation. */
-export const en: RegionalSettings = {
+export const en: Required<RegionalSettings> = {
   closeText: 'Done',
   prevText: 'Prev',
   nextText: 'Next',
@@ -18,11 +18,22 @@ export const en: RegionalSettings = {
   isRTL: false,
   showMonthAfterYear: false,
   yearSuffix: '',
+  timeOnlyTitle: 'Choose Time',
+  timeText: 'Time',
+  hourText: 'Hour',
+  minuteText: 'Minute',
+  secondText: 'Second',
+  millisecText: 'Millisecond',
+  nowText: 'Now',
+  amNames: ['AM', 'A'],
+  pmNames: ['PM', 'P'],
+  timeFormat: 'hh:mm TT',
 };
 
 /** English (UK): day-first dates, weeks start on Monday. */
-export const enGB: RegionalSettings = {
+export const enGB: Required<RegionalSettings> = {
   ...en,
   dateFormat: 'dd/mm/yy',
   firstDay: 1,
+  timeFormat: 'HH:mm',
 };

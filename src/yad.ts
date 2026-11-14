@@ -11,6 +11,8 @@ import {
 import type { FormatSettings, ParseSettings } from './date-utils';
 import { BASE_DEFAULTS, REGIONAL_EN } from './options';
 import type { BeforeShowDayResult, DateSpec, RegionalSettings, YadOptions } from './options';
+import { formatTime, parseTime, timeFormatUnits, timeOf, withTime } from './time-utils';
+import type { TimeParts, TimeSettings } from './time-utils';
 import { de } from './i18n/de';
 import { en, enGB } from './i18n/en';
 import { fr } from './i18n/fr';
@@ -45,6 +47,23 @@ function dateKey(date: Date): string {
   return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
 }
 
+type TimeUnit = keyof TimeParts;
+const TIME_UNITS: TimeUnit[] = ['hour', 'minute', 'second', 'millisec'];
+
+/** Round `value` to the step grid starting at `base`, staying within [min, max]. */
+function snap(value: number, min: number, max: number, base: number, step: number): number {
+  step = Math.max(1, step);
+  let v = base + Math.round((value - base) / step) * step;
+  if (v < min) {
+    v = base + Math.ceil((min - base) / step) * step;
+  }
+  if (v > max) {
+    v = base + Math.floor((max - base) / step) * step;
+  }
+  // If no value on the grid fits, fall back to the bound.
+  return Math.max(min, Math.min(max, v));
+}
+
 function parseKey(key: string): Date {
   const [y, m, d] = key.split('-').map(Number);
   return new Date(y, m - 1, d);
@@ -75,6 +94,18 @@ export class Yad {
   static parseDate = parseDate;
   static iso8601Week = iso8601Week;
   static noWeekends = noWeekends;
+  static formatTime = formatTime;
+  static parseTime = parseTime;
+
+  /** Date and time picker, like the timepicker addon's `$(el).datetimepicker(options)`. */
+  static datetimepicker(target: Target, options: Partial<YadOptions> = {}): Yad {
+    return new Yad(target, { ...options, showTime: true });
+  }
+
+  /** Time-only picker, like the timepicker addon's `$(el).timepicker(options)`. */
+  static timepicker(target: Target, options: Partial<YadOptions> = {}): Yad {
+    return new Yad(target, { ...options, timeOnly: true });
+  }
 
   static setDefaults(options: Partial<YadOptions>): void {
     Object.assign(Yad.defaults, options);
@@ -117,6 +148,10 @@ export class Yad {
   /** First displayed month. */
   private viewYear!: number;
   private viewMonth!: number;
+  /** Selected time of day (only used when the time picker is enabled). */
+  private time!: TimeParts;
+  /** Set while yad dispatches events on its own input, so it does not re-parse its own writes. */
+  private writing = false;
 
   private readonly saved: { autocomplete: string | null; size: number | null } = {
     autocomplete: null, size: null,
@@ -134,12 +169,14 @@ export class Yad {
     this.input = element instanceof HTMLInputElement ? element : null;
     this.inline = !this.input;
     this.settings = { ...Yad.defaults, ...options };
+    this.time = this.defaultTime();
 
     this.container = document.createElement('div');
     this.container.id = this.id;
     this.container.className = 'yad';
     this.container.addEventListener('click', this.onClick);
     this.container.addEventListener('change', this.onSelectChange);
+    this.container.addEventListener('input', this.onTimeInput);
     this.container.addEventListener('keydown', this.onGridKeyDown);
     this.container.addEventListener('mousedown', this.onContainerMouseDown);
 
@@ -192,35 +229,56 @@ export class Yad {
       if ('appendText' in changes || 'isRTL' in changes) {
         this.setupAppendText();
       }
-      if ('autoSize' in changes || 'dateFormat' in changes) {
+      if (['autoSize', 'dateFormat', 'timeFormat', 'showTime', 'timeOnly', 'separator'].some((k) => k in changes)) {
         this.applyAutoSize();
       }
     }
     if ('defaultDate' in changes && this.inline && !this.selected) {
       this.moveCursor(this.getDefaultDate() ?? new Date(), false);
     }
-    if (date && ('dateFormat' in changes || 'minDate' in changes || 'maxDate' in changes ||
-      'monthNames' in changes || 'monthNamesShort' in changes || 'dayNames' in changes ||
-      'dayNamesShort' in changes)) {
-      // Re-format and re-clamp the current date under the new settings.
-      this.setDateInternal(this.clamp(date), false);
+    const reformat = ['dateFormat', 'minDate', 'maxDate', 'monthNames', 'monthNamesShort', 'dayNames',
+      'dayNamesShort', 'altFormat', 'showTime', 'timeOnly', 'timeFormat', 'separator', 'amNames', 'pmNames',
+      'minDateTime', 'maxDateTime', 'stepHour', 'stepMinute', 'stepSecond', 'stepMillisec', 'hourMin', 'hourMax',
+      'minuteMin', 'minuteMax', 'secondMin', 'secondMax', 'millisecMin', 'millisecMax', 'altTimeFormat',
+      'altSeparator'];
+    if (date && reformat.some((k) => k in changes)) {
+      // Re-format and re-clamp the current value under the new settings.
+      this.setDateInternal(this.clamp(stripTime(date)), false, timeOf(date));
     }
     this.refresh();
     return this;
   }
 
-  /** The currently selected date, or null. */
+  /** The currently selected date (including the time when the time picker is enabled), or null. */
   getDate(): Date | null {
     if (this.input) {
       this.syncFromInput();
     }
-    return this.selected ? new Date(this.selected.getTime()) : null;
+    if (!this.selected) {
+      return null;
+    }
+    return this.hasTime ? withTime(this.selected, this.time) : new Date(this.selected.getTime());
   }
 
-  /** Set the date. Accepts a Date, a number of days from today, a formatted or relative string, or null. */
+  /**
+   * Set the date. Accepts a Date, a number of days from today, a formatted or relative string, or null.
+   * With the time picker enabled, a Date's time and a formatted "date time" string set the time too.
+   */
   setDate(date: DateSpec): this {
-    const resolved = date == null || date === '' ? null : this.resolveDate(date, null);
-    this.setDateInternal(resolved ? this.clamp(resolved) : null, false);
+    let resolved: Date | null = null;
+    let time: TimeParts | undefined;
+    if (date != null && date !== '') {
+      if (this.hasTime && date instanceof Date) {
+        resolved = stripTime(date);
+        time = timeOf(date);
+      } else if (this.hasTime && typeof date === 'string') {
+        const parsed = this.parseValue(date);
+        resolved = parsed?.date ?? null;
+        time = parsed?.time ?? undefined;
+      }
+      resolved ??= this.resolveDate(date, null);
+    }
+    this.setDateInternal(resolved ? this.clamp(resolved) : null, false, time);
     this.refresh();
     return this;
   }
@@ -500,7 +558,12 @@ export class Yad {
       const day = findMax(/DD/.test(format) ? this.settings.dayNames : this.settings.dayNamesShort);
       date.setDate(date.getDate() + day - date.getDay() + 7);
     }
-    this.input.size = this.formatDate(date).length;
+    let text = this.formatDate(date);
+    if (this.hasTime) {
+      const timeText = this.formatTimeText({ hour: 23, minute: 59, second: 59, millisec: 999 });
+      text = this.settings.timeOnly ? timeText : text + this.settings.separator + timeText;
+    }
+    this.input.size = text.length;
   }
 
   // ---------------------------------------------------------------------------------------------
@@ -530,13 +593,19 @@ export class Yad {
     return this.clamp(this.resolveDate(this.settings.defaultDate, stripTime(new Date())));
   }
 
+  /** First selectable day: the later of `minDate` and the day of `minDateTime`. */
   private get minDate(): Date | null {
-    return this.resolveDate(this.settings.minDate, null);
+    const min = this.resolveDate(this.settings.minDate, null);
+    const minDT = this.settings.minDateTime ? stripTime(this.settings.minDateTime) : null;
+    return min && minDT ? (min > minDT ? min : minDT) : min ?? minDT;
   }
 
+  /** Last selectable day: the earlier of `maxDate` and the day of `maxDateTime`. */
   private get maxDate(): Date | null {
     const min = this.minDate;
-    const max = this.resolveDate(this.settings.maxDate, null);
+    let max = this.resolveDate(this.settings.maxDate, null);
+    const maxDT = this.settings.maxDateTime ? stripTime(this.settings.maxDateTime) : null;
+    max = max && maxDT ? (max < maxDT ? max : maxDT) : max ?? maxDT;
     return min && max && max < min ? min : max;
   }
 
@@ -580,6 +649,150 @@ export class Yad {
   }
 
   // ---------------------------------------------------------------------------------------------
+  // Time helpers
+  // ---------------------------------------------------------------------------------------------
+
+  private get hasTime(): boolean {
+    return this.settings.showTime || this.settings.timeOnly;
+  }
+
+  private get timeSettings(): TimeSettings {
+    return { amNames: this.settings.amNames, pmNames: this.settings.pmNames };
+  }
+
+  /** Which time units get a control (`showHour` etc., or decided by `timeFormat`). */
+  private get timeUnits(): Record<TimeUnit, boolean> {
+    const s = this.settings;
+    const fromFormat = timeFormatUnits(s.timeFormat);
+    return {
+      hour: s.showHour ?? fromFormat.hour,
+      minute: s.showMinute ?? fromFormat.minute,
+      second: s.showSecond ?? fromFormat.second,
+      millisec: s.showMillisec ?? fromFormat.millisec,
+    };
+  }
+
+  private defaultTime(): TimeParts {
+    const s = this.settings;
+    return { hour: s.hour, minute: s.minute, second: s.second, millisec: s.millisec };
+  }
+
+  private unitConfig(unit: TimeUnit): { min: number; max: number; step: number; text: string } {
+    const s = this.settings;
+    switch (unit) {
+      case 'hour': return { min: s.hourMin, max: s.hourMax, step: s.stepHour, text: s.hourText };
+      case 'minute': return { min: s.minuteMin, max: s.minuteMax, step: s.stepMinute, text: s.minuteText };
+      case 'second': return { min: s.secondMin, max: s.secondMax, step: s.stepSecond, text: s.secondText };
+      default: return { min: s.millisecMin, max: s.millisecMax, step: s.stepMillisec, text: s.millisecText };
+    }
+  }
+
+  /**
+   * Allowed range of `unit` on `day`, on the unit's step grid. `minDateTime` / `maxDateTime` narrow the
+   * range on their own day; a lower unit is only narrowed while all higher units sit exactly on the bound.
+   */
+  private timeLimits(unit: TimeUnit, day: Date | null, time: TimeParts): [number, number] {
+    const s = this.settings;
+    const { min, max, step } = this.unitConfig(unit);
+    let lo = min;
+    let hi = max;
+    const narrow = (bound: Date | null, isMin: boolean): void => {
+      if (!bound || !day || !isSameDay(bound, day)) {
+        return;
+      }
+      const b = timeOf(bound);
+      for (const u of TIME_UNITS) {
+        if (u === unit) {
+          if (isMin) {
+            lo = Math.max(lo, b[u]);
+          } else {
+            hi = Math.min(hi, b[u]);
+          }
+          return;
+        }
+        if (time[u] !== b[u]) {
+          return;
+        }
+      }
+    };
+    narrow(s.minDateTime, true);
+    narrow(s.maxDateTime, false);
+    return [snap(lo, lo, hi, min, step), snap(hi, lo, hi, min, step)];
+  }
+
+  /** Snap each unit to its step and range, highest unit first. */
+  private clampTime(time: TimeParts, day: Date | null): TimeParts {
+    const result = { ...time };
+    for (const unit of TIME_UNITS) {
+      const [lo, hi] = this.timeLimits(unit, day, result);
+      const { min, step } = this.unitConfig(unit);
+      result[unit] = snap(result[unit], lo, hi, min, step);
+    }
+    return result;
+  }
+
+  private formatTimeText(time = this.time, format = this.settings.timeFormat): string {
+    return formatTime(format, time, this.timeSettings);
+  }
+
+  /** The text shown in the input: the date, the time, or both. */
+  private formatValue(date: Date | null): string {
+    if (!date) {
+      return '';
+    }
+    const s = this.settings;
+    if (s.timeOnly) {
+      return this.formatTimeText();
+    }
+    const dateText = this.formatDate(date);
+    return s.showTime ? dateText + s.separator + this.formatTimeText() : dateText;
+  }
+
+  /** Parse input text. Returns null while it cannot be parsed (e.g. incomplete typing). */
+  private parseValue(value: string): { date: Date | null; time: TimeParts | null } | null {
+    const s = this.settings;
+    if (!value) {
+      return { date: null, time: null };
+    }
+    if (s.timeOnly) {
+      const time = parseTime(s.timeFormat, value, this.timeSettings);
+      return time ? { date: stripTime(new Date()), time } : null;
+    }
+    const tryDate = (text: string): Date | null => {
+      try {
+        return parseDate(s.dateFormat, text, this.formatSettings);
+      } catch {
+        return null;
+      }
+    };
+    if (s.showTime && s.separator) {
+      // The separator can also occur inside the date or time format, so try every split position.
+      for (let i = value.indexOf(s.separator); i !== -1; i = value.indexOf(s.separator, i + 1)) {
+        const date = tryDate(value.slice(0, i));
+        const time = date && parseTime(s.timeFormat, value.slice(i + s.separator.length), this.timeSettings);
+        if (date && time) {
+          return { date, time };
+        }
+      }
+    }
+    const date = tryDate(value);
+    return date ? { date, time: null } : null;
+  }
+
+  /** Label of a value in a unit's control, e.g. "03 PM" for hour 15 with a 12-hour format. */
+  private unitLabel(unit: TimeUnit, value: number): string {
+    if (unit === 'hour' && timeFormatUnits(this.settings.timeFormat).ampm) {
+      return formatTime('hh TT', { hour: value }, this.timeSettings);
+    }
+    return String(value).padStart(unit === 'millisec' ? 3 : 2, '0');
+  }
+
+  /** The day the time applies to: the selection, else today (time-only) or the highlighted day. */
+  private get timeDay(): Date {
+    return this.selected ?? (this.settings.timeOnly ? stripTime(new Date()) : this.cursor);
+  }
+
+  // ---------------------------------------------------------------------------------------------
   // State changes
   // ---------------------------------------------------------------------------------------------
 
@@ -588,17 +801,22 @@ export class Yad {
     if (!this.input) {
       return;
     }
-    const value = this.input.value;
-    try {
-      this.selected = value ? this.clamp(parseDate(this.settings.dateFormat, value, this.formatSettings)) : null;
-    } catch {
-      this.selected = value ? this.selected : null;
+    // Unparseable text (e.g. half-typed) keeps the previous selection, like jQuery UI.
+    const parsed = this.parseValue(this.input.value);
+    if (parsed) {
+      this.selected = parsed.date ? this.clamp(parsed.date) : null;
+      if (parsed.time) {
+        this.time = this.clampTime(parsed.time, this.selected);
+      }
     }
   }
 
-  private setDateInternal(date: Date | null, fromUser: boolean): void {
+  private setDateInternal(date: Date | null, fromUser: boolean, time?: TimeParts): void {
     this.selected = date ? stripTime(date) : null;
-    const text = this.formatDate(this.selected);
+    if (this.hasTime) {
+      this.time = this.clampTime(time ?? this.time, this.selected);
+    }
+    const text = this.formatValue(this.selected);
     if (this.input) {
       this.input.value = text;
     }
@@ -609,24 +827,98 @@ export class Yad {
     if (fromUser) {
       this.settings.onSelect?.(text, this);
       if (this.input && text !== this.lastDateText) {
-        this.input.dispatchEvent(new Event('input', { bubbles: true }));
-        this.input.dispatchEvent(new Event('change', { bubbles: true }));
+        this.dispatchOnInput('input', 'change');
       }
     }
     this.lastDateText = text;
   }
 
+  private dispatchOnInput(...types: string[]): void {
+    this.writing = true;
+    try {
+      for (const type of types) {
+        this.input?.dispatchEvent(new Event(type, { bubbles: true }));
+      }
+    } finally {
+      this.writing = false;
+    }
+  }
+
   private updateAltField(): void {
-    const { altField, altFormat, dateFormat } = this.settings;
-    if (!altField) {
+    const s = this.settings;
+    if (!s.altField) {
       return;
     }
-    const field = typeof altField === 'string'
-      ? document.querySelector<HTMLInputElement>(altField)
-      : altField;
-    if (field) {
-      field.value = this.formatDate(this.selected, altFormat || dateFormat);
+    const field = typeof s.altField === 'string'
+      ? document.querySelector<HTMLInputElement>(s.altField)
+      : s.altField;
+    if (!field) {
+      return;
     }
+    let text = '';
+    if (this.selected) {
+      const datePart = s.timeOnly ? '' : this.formatDate(this.selected, s.altFormat || s.dateFormat);
+      const timePart = this.hasTime ? this.formatTimeText(this.time, s.altTimeFormat || s.timeFormat) : '';
+      text = datePart && timePart ? datePart + (s.altSeparator || s.separator) + timePart : datePart || timePart;
+    }
+    field.value = text;
+  }
+
+  /** Change one time unit from a slider or dropdown. `commit` is false while a slider is being dragged. */
+  private updateTimeUnit(unit: TimeUnit, value: number, commit: boolean): void {
+    if (this.disabled) {
+      return;
+    }
+    const day = this.timeDay;
+    this.time = this.clampTime({ ...this.time, [unit]: value }, day);
+    // Changing the time without a selected day selects the highlighted day (today for time-only pickers).
+    if (!this.settings.timeOnly && !this.isSelectable(day)) {
+      this.updateTimeDisplay();
+      return;
+    }
+    if (commit) {
+      this.setDateInternal(day, true);
+      this.render();
+      return;
+    }
+    // Live update while dragging. No re-render: it would interrupt the drag.
+    this.selected = day;
+    if (this.input) {
+      this.input.value = this.formatValue(day);
+      this.dispatchOnInput('input');
+    }
+    this.updateAltField();
+    this.updateTimeDisplay();
+  }
+
+  /** Update the time readout and slider ranges in place (limits can change with the hour). */
+  private updateTimeDisplay(): void {
+    const panel = this.container.querySelector('.yad-time');
+    if (!panel) {
+      return;
+    }
+    const output = panel.querySelector('.yad-time-value');
+    if (output) {
+      output.textContent = this.formatTimeText();
+    }
+    for (const control of Array.from(panel.querySelectorAll<HTMLInputElement>('input[data-unit]'))) {
+      const unit = control.dataset.unit as TimeUnit;
+      const [min, max] = this.timeLimits(unit, this.timeDay, this.time);
+      control.min = String(min);
+      control.max = String(max);
+      control.value = String(this.time[unit]);
+      control.setAttribute('aria-valuetext', this.unitLabel(unit, this.time[unit]));
+    }
+  }
+
+  private selectNow(): void {
+    const now = new Date();
+    const day = this.clamp(stripTime(now));
+    if (!this.settings.timeOnly && !this.isSelectable(day)) {
+      return;
+    }
+    this.setDateInternal(day, true, timeOf(now));
+    this.render();
   }
 
   /** Move the keyboard cursor and scroll the view so it is visible. */
@@ -686,7 +978,8 @@ export class Yad {
       return;
     }
     this.setDateInternal(date, true);
-    if (this.inline) {
+    // With the time picker the popup stays open so the time can be set; "Done" or clicking outside closes it.
+    if (this.inline || this.hasTime) {
       this.render();
     } else {
       this.hide();
@@ -713,29 +1006,80 @@ export class Yad {
     const [rows, cols] = this.monthGrid;
     const grid = this.container.querySelector('.yad-calendar');
     const focusInGrid = !!grid && grid.contains(document.activeElement);
+    const focusedUnit = this.container.contains(document.activeElement)
+      ? (document.activeElement as HTMLElement).dataset.unit
+      : undefined;
 
     this.container.dir = s.isRTL ? 'rtl' : 'ltr';
     this.container.classList.toggle('yad--rtl', s.isRTL);
-    this.container.classList.toggle('yad--multi', rows * cols > 1);
+    this.container.classList.toggle('yad--multi', !s.timeOnly && rows * cols > 1);
+    this.container.classList.toggle('yad--time', this.hasTime);
+    this.container.classList.toggle('yad--time-only', s.timeOnly);
     this.container.style.setProperty('--yad-cols', String(cols));
-    this.container.setAttribute('aria-label', this.formatTitle(this.viewYear, this.viewMonth));
+    this.container.setAttribute('aria-label',
+      s.timeOnly ? s.timeOnlyTitle : this.formatTitle(this.viewYear, this.viewMonth));
 
     let html = '';
-    for (let row = 0; row < rows; row++) {
-      html += '<div class="yad-row">';
-      for (let col = 0; col < cols; col++) {
-        const index = row * cols + col;
-        const date = new Date(this.viewYear, this.viewMonth + index, 1);
-        html += this.renderMonth(date.getFullYear(), date.getMonth(), index, row, col);
+    if (s.timeOnly) {
+      html += `<div class="yad-header"><div class="yad-title">${escapeHtml(s.timeOnlyTitle)}</div></div>`;
+    } else {
+      for (let row = 0; row < rows; row++) {
+        html += '<div class="yad-row">';
+        for (let col = 0; col < cols; col++) {
+          const index = row * cols + col;
+          const date = new Date(this.viewYear, this.viewMonth + index, 1);
+          html += this.renderMonth(date.getFullYear(), date.getMonth(), index, row, col);
+        }
+        html += '</div>';
       }
-      html += '</div>';
+    }
+    if (this.hasTime) {
+      html += this.renderTime();
     }
     html += this.renderButtonPane();
     this.container.innerHTML = html;
 
     if (focusInGrid) {
       this.focusCursor();
+    } else if (focusedUnit) {
+      this.container.querySelector<HTMLElement>(`[data-unit="${focusedUnit}"]`)?.focus();
     }
+  }
+
+  private renderTime(): string {
+    const s = this.settings;
+    const units = this.timeUnits;
+    const day = this.timeDay;
+    const time = this.clampTime(this.time, day);
+    let html = `<div class="yad-time" role="group" aria-label="${escapeHtml(s.timeText)}">` +
+      `<div class="yad-time-row yad-time-current"><span class="yad-time-label">${escapeHtml(s.timeText)}</span>` +
+      `<output class="yad-time-value">${escapeHtml(this.formatTimeText(time))}</output></div>`;
+    for (const unit of TIME_UNITS) {
+      if (!units[unit]) {
+        continue;
+      }
+      const id = `${this.id}-${unit}`;
+      const { min: base, step, text } = this.unitConfig(unit);
+      const [min, max] = this.timeLimits(unit, day, time);
+      const disabled = this.disabled ? ' disabled' : '';
+      html += `<div class="yad-time-row"><label class="yad-time-label" for="${id}">${escapeHtml(text)}</label>`;
+      if (s.controlType === 'select') {
+        html += `<select class="yad-time-select" id="${id}" data-unit="${unit}"${disabled}>`;
+        for (let v = base; v <= max; v += Math.max(1, step)) {
+          if (v >= min) {
+            html += `<option value="${v}"${v === time[unit] ? ' selected' : ''}>` +
+              `${escapeHtml(this.unitLabel(unit, v))}</option>`;
+          }
+        }
+        html += '</select>';
+      } else {
+        html += `<input type="range" class="yad-time-slider" id="${id}" data-unit="${unit}" min="${min}"` +
+          ` max="${max}" step="${Math.max(1, step)}" value="${time[unit]}"` +
+          ` aria-valuetext="${escapeHtml(this.unitLabel(unit, time[unit]))}"${disabled}>`;
+      }
+      html += '</div>';
+    }
+    return html + '</div>';
   }
 
   private formatTitle(year: number, month: number): string {
@@ -915,16 +1259,23 @@ export class Yad {
 
   private renderButtonPane(): string {
     const s = this.settings;
-    if (!s.showButtonPanel) {
+    if (!s.showButtonPanel && !this.hasTime) {
       return '';
     }
     const today = stripTime(new Date());
-    const target = s.gotoCurrent && this.selected ? this.selected : today;
-    const currentText = this.navText(s.currentText, target);
-    const todayEnabled = !this.disabled && this.inRange(target);
     let html = '<div class="yad-buttonpane">';
-    html += `<button type="button" class="yad-current" data-action="today"${todayEnabled ? '' : ' disabled'}>` +
-      `${escapeHtml(currentText)}</button>`;
+    if (this.hasTime) {
+      // "Now" selects the current date and time (the timepicker addon's behaviour).
+      const nowEnabled = !this.disabled && (s.timeOnly || this.isSelectable(this.clamp(today)));
+      html += `<button type="button" class="yad-current" data-action="now"${nowEnabled ? '' : ' disabled'}>` +
+        `${escapeHtml(s.nowText)}</button>`;
+    } else {
+      const target = s.gotoCurrent && this.selected ? this.selected : today;
+      const currentText = this.navText(s.currentText, target);
+      const todayEnabled = !this.disabled && this.inRange(target);
+      html += `<button type="button" class="yad-current" data-action="today"${todayEnabled ? '' : ' disabled'}>` +
+        `${escapeHtml(currentText)}</button>`;
+    }
     if (!this.inline) {
       html += `<button type="button" class="yad-close" data-action="close">${escapeHtml(s.closeText)}</button>`;
     }
@@ -996,20 +1347,20 @@ export class Yad {
   };
 
   private onInputInput = (): void => {
-    if (!this.input) {
+    if (!this.input || this.writing) {
       return;
     }
-    try {
-      const date = parseDate(this.settings.dateFormat, this.input.value, this.formatSettings);
-      if (date && this.inRange(date)) {
-        this.selected = date;
-        this.updateAltField();
-        this.moveCursor(date, true);
-        this.lastDateText = this.input.value;
-        this.refresh();
+    // Incomplete input does not parse: keep the calendar as it is.
+    const parsed = this.parseValue(this.input.value);
+    if (parsed?.date && this.inRange(parsed.date)) {
+      this.selected = parsed.date;
+      if (parsed.time) {
+        this.time = this.clampTime(parsed.time, parsed.date);
       }
-    } catch {
-      // Incomplete input: keep the calendar as it is.
+      this.updateAltField();
+      this.moveCursor(parsed.date, true);
+      this.lastDateText = this.input.value;
+      this.refresh();
     }
   };
 
@@ -1036,11 +1387,10 @@ export class Yad {
         this.hide();
         break;
       case 'Enter':
-        if (this.isSelectable(this.cursor)) {
+        if (!this.settings.timeOnly && this.isSelectable(this.cursor)) {
           this.selectDate(this.cursor);
-        } else {
-          this.hide();
         }
+        this.hide();
         break;
       case 'PageUp':
         this.stepView(ctrl || e.shiftKey ? -12 : -s.stepMonths);
@@ -1216,6 +1566,12 @@ export class Yad {
         chars += ch;
       }
     }
+    if (this.hasTime) {
+      const s = this.settings;
+      const ampm = [...s.amNames, ...s.pmNames].join('');
+      // Literal characters of the time format (e.g. ":"), the separator and the am/pm names.
+      chars += s.separator + s.timeFormat.replace(/[HhmslTt']/g, '') + ampm.toUpperCase() + ampm.toLowerCase();
+    }
     return chars;
   }
 
@@ -1244,14 +1600,30 @@ export class Yad {
       case 'today':
         this.gotoToday();
         break;
+      case 'now':
+        this.selectNow();
+        break;
       case 'close':
         this.closeAndFocusInput();
         break;
     }
   };
 
+  /** Slider moved (fires continuously while dragging). */
+  private onTimeInput = (e: Event): void => {
+    const control = e.target as HTMLInputElement;
+    if (control.type === 'range' && control.dataset.unit) {
+      this.updateTimeUnit(control.dataset.unit as TimeUnit, Number(control.value), false);
+    }
+  };
+
   private onSelectChange = (e: Event): void => {
     const select = e.target as HTMLSelectElement;
+    if (select.dataset.unit) {
+      // Time dropdown changed, or slider released: commit (onSelect, change event).
+      this.updateTimeUnit(select.dataset.unit as TimeUnit, Number(select.value), true);
+      return;
+    }
     const action = select.dataset.action;
     if (action !== 'month' && action !== 'year') {
       return;
@@ -1268,8 +1640,8 @@ export class Yad {
   };
 
   private onContainerMouseDown = (e: MouseEvent): void => {
-    // Keep focus in the input when clicking the popup with the mouse (selects need default handling).
-    if (!this.inline && !(e.target as HTMLElement).closest('select')) {
+    // Keep focus in the input when clicking the popup with the mouse (form controls need default handling).
+    if (!this.inline && !(e.target as HTMLElement).closest('select, input')) {
       e.preventDefault();
     }
   };
