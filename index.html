@@ -14,9 +14,23 @@
     input { font: inherit; padding: 6px 8px; }
     .row { display: flex; gap: 32px; flex-wrap: wrap; align-items: flex-start; }
     .out { color: #888; font-size: 0.9em; margin-top: 6px; }
+    .theme-switcher { position: fixed; top: 12px; right: 16px; z-index: 10; display: inline-flex; margin: 0; padding: 0;
+      border: 1px solid rgba(127,127,127,.45); border-radius: 8px; overflow: hidden; background: Canvas; }
+    .theme-switcher legend { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+    .theme-switcher label { padding: 4px 12px; font-size: 13px; cursor: pointer; }
+    .theme-switcher label + label { border-left: 1px solid rgba(127,127,127,.45); }
+    .theme-switcher input { position: absolute; opacity: 0; pointer-events: none; }
+    .theme-switcher label:has(input:checked) { color: #fff; background: #2563eb; }
+    .theme-switcher label:has(input:focus-visible) { outline: 2px solid #2563eb; outline-offset: -3px; }
   </style>
 </head>
 <body>
+  <fieldset class="theme-switcher">
+    <legend>Theme</legend>
+    <label><input type="radio" name="theme" value="light"> Light</label>
+    <label><input type="radio" name="theme" value="dark"> Dark</label>
+    <label><input type="radio" name="theme" value="auto"> Auto</label>
+  </fieldset>
   <h1>yad</h1>
   <p>Yet Another Datepicker: dependency-free, with a jQuery UI compatible API.</p>
 
@@ -95,8 +109,6 @@
   <script type="module">
     import { Yad } from './src/index.ts';
     window.Yad = Yad;
-    // This page has a dark mode that follows the system, so the pickers should too.
-    Yad.setDefaults({ theme: 'auto' });
 
     new Yad('#basic');
     new Yad('#full', { changeMonth: true, changeYear: true, showButtonPanel: true, showWeek: true, firstDay: 1 });
@@ -124,6 +136,24 @@
       monthNames: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'],
       dayNamesMin: ['ح', 'ن', 'ث', 'ر', 'خ', 'ج', 'س'],
       firstDay: 6,
+    });
+
+    // Theme switcher: sets the page colour scheme and the `theme` option of every picker.
+    function applyTheme(mode) {
+      document.documentElement.style.colorScheme = mode === 'auto' ? 'light dark' : mode;
+      Yad.setDefaults({ theme: mode });
+      document.querySelectorAll('[id]').forEach(function (el) {
+        var dp = Yad.getInstance(el);
+        if (dp) dp.option('theme', mode);
+      });
+      document.querySelector('.theme-switcher input[value="' + mode + '"]').checked = true;
+      try { localStorage.setItem('yad-demo-theme', mode); } catch (e) { /* storage unavailable */ }
+    }
+    var savedTheme = null;
+    try { savedTheme = localStorage.getItem('yad-demo-theme'); } catch (e) { /* storage unavailable */ }
+    applyTheme(savedTheme || 'auto');
+    document.querySelectorAll('.theme-switcher input').forEach(function (radio) {
+      radio.addEventListener('change', function () { applyTheme(radio.value); });
     });
   </script>
 </body>

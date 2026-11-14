@@ -10,7 +10,14 @@
   <div class="container py-4" style="max-width: 760px">
     <div class="d-flex align-items-center justify-content-between mb-4">
       <h1 class="h3 mb-0">yad, Bootstrap 5 theme</h1>
-      <button class="btn btn-sm btn-outline-secondary" id="toggle-theme" type="button">Toggle dark mode</button>
+      <div class="btn-group btn-group-sm" role="group" aria-label="Theme">
+        <input type="radio" class="btn-check" name="theme" id="theme-light" value="light" autocomplete="off">
+        <label class="btn btn-outline-secondary" for="theme-light">Light</label>
+        <input type="radio" class="btn-check" name="theme" id="theme-dark" value="dark" autocomplete="off">
+        <label class="btn btn-outline-secondary" for="theme-dark">Dark</label>
+        <input type="radio" class="btn-check" name="theme" id="theme-auto" value="auto" autocomplete="off">
+        <label class="btn btn-outline-secondary" for="theme-auto">Auto</label>
+      </div>
     </div>
 
     <div class="row g-4">
@@ -85,9 +92,21 @@
     new Yad('#inline', { showButtonPanel: true });
     new Yad('#in-modal', { showButtonPanel: true });
 
-    document.getElementById('toggle-theme').addEventListener('click', () => {
-      const html = document.documentElement;
-      html.dataset.bsTheme = html.dataset.bsTheme === 'dark' ? 'light' : 'dark';
+    // Theme switcher. With the Bootstrap theme, the pickers follow Bootstrap's colour mode (data-bs-theme),
+    // so the switcher sets that; "Auto" follows the operating system and updates when it changes.
+    const systemDark = matchMedia('(prefers-color-scheme: dark)');
+    let themeMode = 'light';
+    try { themeMode = localStorage.getItem('yad-demo-bs-theme') || 'light'; } catch { /* storage unavailable */ }
+    function applyTheme(mode) {
+      themeMode = mode;
+      document.documentElement.dataset.bsTheme = mode === 'auto' ? (systemDark.matches ? 'dark' : 'light') : mode;
+      document.getElementById(`theme-${mode}`).checked = true;
+      try { localStorage.setItem('yad-demo-bs-theme', mode); } catch { /* storage unavailable */ }
+    }
+    applyTheme(themeMode);
+    systemDark.addEventListener('change', () => themeMode === 'auto' && applyTheme('auto'));
+    document.querySelectorAll('input[name="theme"]').forEach((radio) => {
+      radio.addEventListener('change', () => applyTheme(radio.value));
     });
   </script>
 </body>
