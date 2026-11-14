@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { Yad } from '../src/yad';
 import type { Yad as YadType } from '../src/yad';
+import { de } from '../src/i18n/de';
 import { create, d, dayButton, html, input, key, q, qa, setValue, texts, track, usePickerEnv } from './helpers';
 
 usePickerEnv();
@@ -295,7 +296,7 @@ describe('formatting and parsing', () => {
     const dp = datetime({ timeFormat: 'hh:mm TT', dateFormat: 'mm/dd/yy' });
     dp.setDate(d(2026, 11, 20, 15, 5));
     expect(input().value).toBe('11/20/2026 03:05 PM');
-    dp.option(Yad.regional.de);
+    dp.option(de);
     expect(input().value).toBe('20.11.2026 15:05');
   });
 
@@ -310,7 +311,7 @@ describe('formatting and parsing', () => {
   });
 
   it('a locale without time texts falls back to English', () => {
-    const { timeText, nowText, ...dateOnly } = Yad.regional.de;
+    const { timeText, nowText, ...dateOnly } = de;
     void timeText;
     void nowText;
     html('<input id="date">');
@@ -363,7 +364,7 @@ describe('time only', () => {
   });
 
   it('labels the popup with timeOnlyTitle', () => {
-    const dp = timeOnly({ ...Yad.regional.de, timeFormat: 'HH:mm' });
+    const dp = timeOnly({ ...de, timeFormat: 'HH:mm' });
     dp.show();
     expect(dp.widget().getAttribute('aria-label')).toBe('Zeit wählen');
     expect(dp.widget().classList.contains('yad--time-only')).toBe(true);

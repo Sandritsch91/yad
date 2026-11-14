@@ -16,7 +16,7 @@ The calendar gets a time section with a readout and one slider per unit, plus a 
 
 ```
 11/20/2026 03:05 PM          (English, default)
-20.11.2026 15:05             (Yad.regional.de)
+20.11.2026 15:05             (German locale)
 ```
 
 How it behaves:
@@ -166,8 +166,10 @@ English ones are used then. See [Localisation](localization.md).
 ## Example: appointment booking
 
 ```js
+import { de } from '@sandritsch91/yad/i18n/de';
+
 new Yad('#appointment', {
-  ...Yad.regional.de,
+  ...de,
   showTime: true,
   minDate: 1,                       // from tomorrow
   maxDate: '+2m',

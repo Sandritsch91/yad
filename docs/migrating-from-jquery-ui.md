@@ -21,7 +21,7 @@ change how pickers are created and how methods are called.
 | `$('#d').datepicker('widget')` | `dp.widget()` (an element, not a jQuery object) |
 | `$('#d').datepicker('destroy')` | `dp.destroy()` |
 | `$.datepicker.setDefaults(opts)` | `Yad.setDefaults(opts)` |
-| `$.datepicker.regional['de']` | `Yad.regional.de` |
+| `$.datepicker.regional['de']` | `Yad.regional.de` after loading it (`import { de } from '@sandritsch91/yad/i18n/de'`, or `dist/i18n/de.umd.js` for `<script>` tags, like `datepicker-de.js`) |
 | `$.datepicker.formatDate(f, d, s)` | `Yad.formatDate(f, d, s)` |
 | `$.datepicker.parseDate(f, t, s)` | `Yad.parseDate(f, t, s)` |
 | `$.datepicker.iso8601Week(d)` | `Yad.iso8601Week(d)` |
@@ -38,7 +38,7 @@ Where jQuery UI looks the instance up from the element each time, keep the `Yad`
 | `$('#d').timepicker(opts)` | `Yad.timepicker('#d', opts)` |
 | `$.datepicker.formatTime(f, t, s)` | `Yad.formatTime(f, t, s)` |
 | `$.datepicker.parseTime(f, t, s)` | `Yad.parseTime(f, t, s)` |
-| `$.timepicker.regional['de']` | Part of `Yad.regional.de` |
+| `$.timepicker.regional['de']` | Part of the `de` locale |
 
 See [Time picker](time-picker.md#differences-from-the-timepicker-addon) for the options that are not
 implemented.
@@ -48,6 +48,7 @@ implemented.
 Before:
 
 ```js
+// with jquery-ui/i18n/datepicker-de.js loaded
 $.datepicker.setDefaults($.datepicker.regional['de']);
 
 $('#from').datepicker({
@@ -64,9 +65,10 @@ After:
 
 ```js
 import { Yad } from '@sandritsch91/yad';
+import { de } from '@sandritsch91/yad/i18n/de';
 import '@sandritsch91/yad/yad.css';
 
-Yad.setDefaults(Yad.regional.de);
+Yad.setDefaults(de);
 
 const to = new Yad('#to', { numberOfMonths: 2 });
 new Yad('#from', {

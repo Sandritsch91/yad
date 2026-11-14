@@ -29,11 +29,3 @@ export const en: Required<RegionalSettings> = {
   pmNames: ['PM', 'P'],
   timeFormat: 'hh:mm TT',
 };
-
-/** English (UK): day-first dates, weeks start on Monday. */
-export const enGB: Required<RegionalSettings> = {
-  ...en,
-  dateFormat: 'dd/mm/yy',
-  firstDay: 1,
-  timeFormat: 'HH:mm',
-};

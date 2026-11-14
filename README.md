@@ -55,7 +55,7 @@ Pin a version in production, e.g. `@sandritsch91/yad@1.0.0`.
 | `enable` / `disable` / `isDisabled`         | `dp.enable()` …                   |
 | `widget`                                    | `dp.widget()`                     |
 | `$.datepicker.setDefaults(...)`             | `Yad.setDefaults(...)`            |
-| `$.datepicker.regional['de']`               | `Yad.regional.de`                 |
+| `$.datepicker.regional['de']`               | `Yad.regional.de` (after loading `i18n/de`) |
 | `$.datepicker.formatDate / parseDate`       | `Yad.formatDate / Yad.parseDate`  |
 | `$.datepicker.iso8601Week / noWeekends`     | `Yad.iso8601Week / Yad.noWeekends`|
 
@@ -130,7 +130,7 @@ Differences from jQuery UI:
 - Day cells are buttons in an ARIA grid. When focus is in the calendar, the arrow keys, Home/End, PageUp/PageDown (Shift for a year), Enter/Space and Escape work.
 - jQuery UI's keyboard shortcuts on the input also work: Ctrl+arrows, PageUp/PageDown, Ctrl+Home, Ctrl+End and Enter. ArrowDown moves focus into the calendar.
 - Theming uses CSS custom properties (`--yad-accent`, `--yad-bg` and so on). The picker is light by default; `theme: 'dark'` makes it dark and `theme: 'auto'` follows the operating system.
-- Bundled locales: `Yad.regional.en` (also `''` and `'en-US'`, the default), `'en-GB'`, `de` and `fr`. Use one with `Yad.setDefaults(Yad.regional.fr)` or `new Yad(el, { ...Yad.regional.fr })`.
+- 82 locales. Only English is built in (the default); load the others yourself, one at a time (`import { de } from '@sandritsch91/yad/i18n/de'`, or `dist/i18n/de.umd.js` for `<script>` tags) or all at once (`@sandritsch91/yad/i18n`, `yad-i18n.umd.js`). See [Localisation](docs/localization.md).
 - The `dialog` method and `showOptions` are not implemented.
 
 ## Documentation
@@ -143,7 +143,7 @@ Full documentation is in [`docs/`](docs/README.md):
 - [Events and callbacks](docs/events.md): `onSelect`, `onClose`, `beforeShowDay`, DOM events
 - [Date and time formats](docs/formats.md): format tokens, parsing, relative dates
 - [Time picker](docs/time-picker.md): date + time and time-only pickers
-- [Localisation](docs/localization.md): bundled locales and writing your own
+- [Localisation](docs/localization.md): 82 locales, loading them, and writing your own
 - [Theming](docs/theming.md): CSS custom properties, dark mode, Bootstrap 5, CSS classes
 - [Keyboard and accessibility](docs/keyboard-and-accessibility.md)
 - [Migrating from jQuery UI](docs/migrating-from-jquery-ui.md)

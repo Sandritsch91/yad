@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- 78 more locales, for 82 in total: Afrikaans, Albanian, Arabic, Armenian, Azerbaijani, Basque, Belarusian, Bengali,
+  Bosnian, Bulgarian, Catalan, Chinese (Simplified; Traditional for Taiwan and Hong Kong), Croatian, Czech, Danish,
+  Dutch (+ Belgium), English (Australia, Canada, India, Ireland, New Zealand, South Africa), Esperanto, Estonian,
+  Faroese, Filipino, Finnish, French (Belgium, Canada, Switzerland), Galician, Georgian, German (Austria, Switzerland),
+  Greek, Hebrew, Hindi, Hungarian, Icelandic, Indonesian, Irish, Italian (+ Switzerland), Japanese, Kazakh, Korean,
+  Latvian, Lithuanian, Macedonian, Malay, Norwegian (Bokmål, Nynorsk), Persian, Polish, Portuguese (Portugal, Brazil),
+  Romanian, Russian, Serbian (Cyrillic, Latin), Slovak, Slovenian, Spanish (Spain, Argentina, Mexico), Swahili,
+  Swedish, Tamil, Thai, Turkish, Ukrainian, Urdu, Uzbek, Vietnamese and Welsh.
+- New entry points so only the languages you use are loaded: `@sandritsch91/yad/i18n/<key>` (one locale, about 1 KB),
+  `@sandritsch91/yad/i18n` (all locales and a `locales` record) and `dist/yad-i18n.umd.js` (all locales for `<script>`
+  tags, registered on `yad.Yad.regional`).
+- One classic-script file per locale, `dist/i18n/<key>.umd.js` (about 2 KB), that registers itself on
+  `yad.Yad.regional` when loaded after `yad.umd.js`, like jQuery UI's `datepicker-xx.js` files.
+- `scripts/generate-locales.mjs` (`npm run generate:locales`) generates the locales from Unicode CLDR data.
+- Language selector on the demo pages.
+
+### Changed
+
+- **Breaking:** only English is built into `yad.js` (the default, `Yad.regional.en`, also `''` and `en-US`). `en-GB`,
+  `de` and `fr` are no longer built in and the core package no longer exports `enGB`, `de` and `fr`: load them like
+  every other language, e.g. `import { de } from '@sandritsch91/yad/i18n/de'` and `Yad.regional.de = de`, or
+  `dist/i18n/de.umd.js` for `<script>` tags. The core bundle is about 2 KB smaller.
+
 ## [1.0.0] - 2026-11-14
 
 First stable release.

@@ -8,6 +8,5 @@ export type { TimeParts, TimeSettings } from './time-utils';
 export type {
   YadOptions, RegionalSettings, TimeRegionalSettings, TimeControlType, YadTheme, DateSpec, BeforeShowDayResult,
 } from './options';
-export { de } from './i18n/de';
-export { en, enGB } from './i18n/en';
-export { fr } from './i18n/fr';
+// Only English is built in. Other languages: @sandritsch91/yad/i18n/<key> or @sandritsch91/yad/i18n.
+export { en } from './i18n/en';

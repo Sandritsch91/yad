@@ -53,6 +53,16 @@
   </section>
 
   <section>
+    <label>Languages</label>
+    <p>
+      <select id="lang" aria-label="Language"></select>
+      <input id="lang-input" size="28" aria-label="Date and time in the selected language">
+    </p>
+    <div id="lang-inline"></div>
+    <p><code>&lt;script src="yad-i18n.umd.js"&gt;&lt;/script&gt;</code> after <code>yad.umd.js</code> adds every locale to <code>yad.Yad.regional</code></p>
+  </section>
+
+  <section>
     <label>Inline (French)</label>
     <div id="calendar"></div>
   </section>
@@ -63,6 +73,7 @@
   </section>
 
   <script src="../dist/yad.umd.js"></script>
+  <script src="../dist/yad-i18n.umd.js"></script>
   <script>
     var Yad = yad.Yad;
 
@@ -88,6 +99,27 @@
       timeFormat: 'HH:mm',
       onSelect: function (text) { console.log('selected', text); }
     });
+
+    // Language demo
+    var locales = Yad.regional;
+    var langNames = new Intl.DisplayNames(['en'], { type: 'language' });
+    var langSelect = document.getElementById('lang');
+    Object.keys(locales).filter(function (key) { return key !== ''; }).map(function (key) {
+      var name = key;
+      try { name = langNames.of(key) || key; } catch (e) { /* unknown code */ }
+      return { key: key, label: name + ' (' + key + ')' };
+    }).sort(function (a, b) { return a.label.localeCompare(b.label); }).forEach(function (item) {
+      langSelect.add(new Option(item.label, item.key));
+    });
+    var langPopup = new Yad('#lang-input', { showTime: true });
+    var langInline = new Yad('#lang-inline', { showTime: true, numberOfMonths: 2 });
+    function applyLanguage(key) {
+      langPopup.option(locales[key]);
+      langInline.option(locales[key]);
+    }
+    langSelect.value = 'ja';
+    applyLanguage('ja');
+    langSelect.addEventListener('change', function () { applyLanguage(langSelect.value); });
 
     // Theme switcher: sets the page colour scheme and the `theme` option of every picker.
     function applyTheme(mode) {

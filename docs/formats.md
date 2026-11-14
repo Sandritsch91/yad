@@ -70,8 +70,10 @@ sliders, `'HH:mm:ss'` adds seconds.
 ### `formatDate(format, date, settings?)`
 
 ```js
-Yad.formatDate('DD, d MM yy', new Date(2026, 1, 3));                 // 'Tuesday, 3 February 2026'
-Yad.formatDate('DD, d MM yy', new Date(2026, 1, 3), Yad.regional.de); // 'Dienstag, 3 Februar 2026'
+import { de } from '@sandritsch91/yad/i18n/de';
+
+Yad.formatDate('DD, d MM yy', new Date(2026, 1, 3));      // 'Tuesday, 3 February 2026'
+Yad.formatDate('DD, d MM yy', new Date(2026, 1, 3), de);  // 'Dienstag, 3 Februar 2026'
 Yad.formatDate('yy-mm-dd', null);                                     // ''
 ```
 
@@ -83,7 +85,7 @@ works as is.
 ```js
 Yad.parseDate('yy-mm-dd', '2026-02-03');               // Date(2026, 1, 3)
 Yad.parseDate('d MM yy', '3 february 2026');           // names are case-insensitive
-Yad.parseDate('d. MM yy', '3. März 2026', Yad.regional.de);
+Yad.parseDate('d. MM yy', '3. März 2026', de);       // de from '@sandritsch91/yad/i18n/de'
 Yad.parseDate('dd/mm/y', '03/02/70', { shortYearCutoff: 50 }); // 1970
 Yad.parseDate('yy-mm-dd', '');                         // null
 ```
@@ -130,7 +132,7 @@ The named export `determineDate(spec, fallback, format?, settings?)` performs th
 Yad.formatTime('HH:mm', { hour: 15, minute: 7 });            // '15:07'
 Yad.formatTime('hh:mm TT', { hour: 15, minute: 7 });         // '03:07 PM'
 Yad.formatTime('h:mm tt', { hour: 0, minute: 30 });          // '12:30 am'
-Yad.formatTime('hh:mm TT', { hour: 9 }, Yad.regional.de);    // '09:00 VORM.'
+Yad.formatTime('hh:mm TT', { hour: 9 }, de);                 // '09:00 VORM.' (de locale)
 ```
 
 ### `parseTime(format, text, settings?)`

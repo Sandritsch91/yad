@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { formatTime, parseTime, timeFormatUnits } from '../src/time-utils';
 import { Yad } from '../src/yad';
+import { fr } from '../src/i18n/fr';
 import { de } from '../src/i18n/de';
 
 const d = (y: number, m: number, day: number, h = 0, min = 0, s = 0) => new Date(y, m - 1, day, h, min, s);
@@ -160,7 +161,7 @@ describe('time picker', () => {
 
   it('parses typed date and time', () => {
     const input = setup();
-    const dp = create(input, { ...Yad.regional.de, showTime: true });
+    const dp = create(input, { ...de, showTime: true });
     input.value = '24.12.2026 18:30';
     expect(dp.getDate()).toEqual(d(2026, 12, 24, 18, 30));
     dp.show();
@@ -273,7 +274,7 @@ describe('time picker', () => {
 
   it('uses localised time texts', () => {
     const input = setup();
-    const dp = create(input, { ...Yad.regional.fr, showTime: true });
+    const dp = create(input, { ...fr, showTime: true });
     dp.show();
     const labels = Array.from(dp.widget().querySelectorAll('.yad-time-label')).map((l) => l.textContent);
     expect(labels).toEqual(['Heure', 'Heures', 'Minutes']);

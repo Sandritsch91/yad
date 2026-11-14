@@ -24,6 +24,9 @@ The package ships:
 | `dist/yad.umd.js` | UMD | Classic `<script src>`, sets `window.yad` |
 | `dist/yad.css` | CSS | Base styles (required) |
 | `dist/themes/bootstrap5.css` | CSS | Optional [Bootstrap 5 theme](theming.md#bootstrap-5-theme) |
+| `dist/i18n/<key>.js` / `.cjs` | ES module / CommonJS | One [locale](localization.md) each (`@sandritsch91/yad/i18n/ja`), plus `index` with all of them (`@sandritsch91/yad/i18n`) |
+| `dist/i18n/<key>.umd.js` | UMD | One locale for `<script>` tags; registers it on `yad.Yad.regional` |
+| `dist/yad-i18n.umd.js` | UMD | All locales for `<script>` tags; registers them on `yad.Yad.regional` |
 | `dist/*.d.ts` | TypeScript | Type definitions (picked up automatically) |
 
 ### Without a build step: ES module from a CDN
@@ -109,7 +112,7 @@ options to the existing instance and returns it.
 
 ```js
 Yad.setDefaults({ dateFormat: 'yy-mm-dd', firstDay: 1 });
-Yad.setDefaults(Yad.regional.de);   // German everywhere
+Yad.setDefaults(de);                // German everywhere (import { de } from '@sandritsch91/yad/i18n/de')
 ```
 
 `setDefaults` only affects pickers created afterwards.

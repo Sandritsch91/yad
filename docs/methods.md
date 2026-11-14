@@ -37,7 +37,7 @@ Changing an option re-renders the picker. When the change affects how the value 
 ```js
 dp.option('dateFormat');                 // 'yy-mm-dd'
 dp.option('dateFormat', 'dd.mm.yy');     // input changes from 2026-12-24 to 24.12.2026
-dp.option(Yad.regional.fr);              // switch language
+dp.option(fr);                           // switch language (fr from '@sandritsch91/yad/i18n/fr')
 ```
 
 ### `getDate()`
@@ -119,7 +119,7 @@ attached.
 Changes `Yad.defaults` for all pickers created afterwards.
 
 ```js
-Yad.setDefaults({ ...Yad.regional.de, showButtonPanel: true });
+Yad.setDefaults({ ...de, showButtonPanel: true });   // de from '@sandritsch91/yad/i18n/de'
 ```
 
 ### `Yad.defaults`
@@ -128,7 +128,8 @@ The current default options (`YadOptions`).
 
 ### `Yad.regional`
 
-The bundled locales: `''`, `en`, `en-US`, `en-GB`, `de`, `fr`. See [Localisation](localization.md).
+The registered locales. Built in: `''`, `en`, `en-US` (English). Add others with `Yad.regional.de = de` or
+`Object.assign(Yad.regional, locales)`. See [Localisation](localization.md).
 
 ### `Yad.getInstance(target)`
 
@@ -175,7 +176,11 @@ The ES module and CommonJS builds export:
 | `formatDate`, `parseDate`, `iso8601Week`, `noWeekends` | Same as the static methods. |
 | `formatTime`, `parseTime` | Same as the static methods. |
 | `determineDate(spec, fallback, format?, settings?)` | Resolves a [date spec](options.md) to a `Date` (or `fallback`). |
-| `en`, `enGB`, `de`, `fr` | The locale objects. |
+| `en` | The built-in English locale. |
+
+The other locales are separate entry points: `@sandritsch91/yad/i18n/<key>` exports one locale (e.g.
+`import { ptBR } from '@sandritsch91/yad/i18n/pt-BR'`), and `@sandritsch91/yad/i18n` exports all of them plus a
+`locales` record keyed like `Yad.regional`. See [Localisation](localization.md#loading-more-locales).
 
 TypeScript types: `YadOptions`, `RegionalSettings`, `TimeRegionalSettings`, `TimeControlType`, `YadTheme`, `DateSpec`,
 `BeforeShowDayResult`, `FormatSettings`, `ParseSettings`, `TimeParts`, `TimeSettings`.

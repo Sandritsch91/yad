@@ -13,9 +13,7 @@ import { BASE_DEFAULTS, REGIONAL_EN } from './options';
 import type { BeforeShowDayResult, DateSpec, RegionalSettings, YadOptions } from './options';
 import { formatTime, parseTime, timeFormatUnits, timeOf, withTime } from './time-utils';
 import type { TimeParts, TimeSettings } from './time-utils';
-import { de } from './i18n/de';
-import { en, enGB } from './i18n/en';
-import { fr } from './i18n/fr';
+import { en } from './i18n/en';
 
 type Target = HTMLElement | string;
 
@@ -85,10 +83,11 @@ export class Yad {
   /** Global defaults applied to every new instance. Change them with `Yad.setDefaults()`. */
   static defaults: YadOptions = { ...BASE_DEFAULTS, ...REGIONAL_EN };
 
-  /** Localisations. `''` is the default (English). Use: `Yad.setDefaults(Yad.regional.de)`. */
-  static regional: Record<string, RegionalSettings> = {
-    '': REGIONAL_EN, en, 'en-US': en, 'en-GB': enGB, de, fr,
-  };
+  /**
+   * Localisations. Only English is built in (`''`, `en`, `en-US`, the default); add others from
+   * `@sandritsch91/yad/i18n`, e.g. `Yad.regional.de = de` or `Object.assign(Yad.regional, locales)`.
+   */
+  static regional: Record<string, RegionalSettings> = { '': REGIONAL_EN, en, 'en-US': en };
 
   static formatDate = formatDate;
   static parseDate = parseDate;

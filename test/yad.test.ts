@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { de } from '../src/i18n/de';
 import { Yad } from '../src/yad';
 
 const d = (y: number, m: number, day: number) => new Date(y, m - 1, day);
@@ -240,7 +241,7 @@ describe('Yad', () => {
 
   it('uses regional settings', () => {
     const input = setup();
-    const dp = create(input, { ...Yad.regional.de });
+    const dp = create(input, { ...de });
     dp.setDate(d(2026, 3, 2));
     expect(input.value).toBe('02.03.2026');
     dp.show();

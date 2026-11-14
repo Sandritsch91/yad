@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { formatDate, parseDate } from '../src/date-utils';
 import { Yad } from '../src/yad';
 import { de } from '../src/i18n/de';
-import { en, enGB } from '../src/i18n/en';
+import { en } from '../src/i18n/en';
+import { enGB } from '../src/i18n/en-GB';
 import { fr } from '../src/i18n/fr';
 
 const d = (y: number, m: number, day: number) => new Date(y, m - 1, day);
@@ -18,13 +19,22 @@ describe('regional settings', () => {
     expect(locale.dayNamesMin).toHaveLength(7);
   });
 
-  it('registers all locales on Yad.regional', () => {
+  it('only English is built in', () => {
     expect(Yad.regional['']).toBe(en);
     expect(Yad.regional.en).toBe(en);
     expect(Yad.regional['en-US']).toBe(en);
-    expect(Yad.regional['en-GB']).toBe(enGB);
-    expect(Yad.regional.de).toBe(de);
-    expect(Yad.regional.fr).toBe(fr);
+    expect(Object.keys(Yad.regional).sort()).toEqual(['', 'en', 'en-US']);
+    expect(Yad.defaults.dateFormat).toBe(en.dateFormat);
+  });
+
+  it('other locales are registered manually', () => {
+    const before = { ...Yad.regional };
+    try {
+      Yad.regional.de = de;
+      expect(Yad.regional.de).toBe(de);
+    } finally {
+      Yad.regional = before;
+    }
   });
 
   it('formats and parses French dates', () => {
@@ -44,7 +54,7 @@ describe('regional settings', () => {
 
   it('renders the French calendar', () => {
     document.body.innerHTML = '<div id="cal"></div>';
-    const dp = new Yad('#cal', { ...Yad.regional.fr, defaultDate: d(2026, 8, 15), showButtonPanel: true });
+    const dp = new Yad('#cal', { ...fr, defaultDate: d(2026, 8, 15), showButtonPanel: true });
     const w = dp.widget();
     expect(w.querySelector('.yad-month')!.textContent).toBe('août');
     expect(Array.from(w.querySelectorAll('thead th')).map((th) => th.textContent).join('')).toBe('LMMJVSD');

@@ -1,5 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { Yad } from '../src/yad';
+import { de } from '../src/i18n/de';
+import { fr } from '../src/i18n/fr';
 import { create, d, dayButton, html, q, qa, setValue, shownMonth, texts, usePickerEnv } from './helpers';
 
 usePickerEnv();
@@ -117,7 +119,7 @@ describe('dropdowns', () => {
   });
 
   it('use monthNamesShort', () => {
-    const dp = inline({ ...Yad.regional.de, changeMonth: true });
+    const dp = inline({ ...de, changeMonth: true });
     expect(q<HTMLSelectElement>(dp, '.yad-month-select')!.options[2].textContent).toBe('Mär');
   });
 
@@ -199,7 +201,7 @@ describe('day grid', () => {
   });
 
   it('labels day buttons with the full localised date', () => {
-    const dp = inline({ ...Yad.regional.fr });
+    const dp = inline({ ...fr });
     expect(dayButton(dp, d(2026, 11, 14))!.getAttribute('aria-label')).toBe('samedi, 14 novembre 2026');
   });
 
@@ -225,7 +227,7 @@ describe('day grid', () => {
   });
 
   it('abbreviation titles carry the full day names', () => {
-    const dp = inline({ ...Yad.regional.de });
+    const dp = inline({ ...de });
     expect(qa(dp, 'thead abbr').map((a) => a.getAttribute('title'))[0]).toBe('Montag');
   });
 
