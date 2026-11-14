@@ -49,9 +49,21 @@ function tokenize(format: string): Token[] {
         i += 2;
         continue;
       }
-      const end = format.indexOf("'", i + 1);
-      literal += format.slice(i + 1, end === -1 ? format.length : end);
-      i = end === -1 ? format.length : end + 1;
+      // Quoted literal up to the closing quote; inside it, '' is an escaped quote (as in date formats).
+      i++;
+      while (i < format.length) {
+        if (format[i] === "'") {
+          if (format[i + 1] === "'") {
+            literal += "'";
+            i += 2;
+            continue;
+          }
+          i++;
+          break;
+        }
+        literal += format[i];
+        i++;
+      }
       continue;
     }
     const token = TOKENS.find((t) => format.startsWith(t, i));
@@ -226,8 +238,4 @@ export function timeOf(date: Date): TimeParts {
 export function withTime(date: Date, time: TimeParts): Date {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate(), time.hour, time.minute, time.second,
     time.millisec);
-}
-
-export function compareTime(a: TimeParts, b: TimeParts): number {
-  return (a.hour - b.hour) || (a.minute - b.minute) || (a.second - b.second) || (a.millisec - b.millisec);
 }

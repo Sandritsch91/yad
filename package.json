@@ -39,6 +39,7 @@
     "build": "tsc --noEmit && vite build && tsc -p tsconfig.build.json && node -e \"require('fs').cpSync('src/themes','dist/themes',{recursive:true})\"",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit"
   },
   "keywords": [
@@ -49,6 +50,7 @@
     "vanilla"
   ],
   "devDependencies": {
+    "@vitest/coverage-v8": "^5.1.0",
     "jsdom": "^31.0.0",
     "typescript": "^7.0.2",
     "vite": "^8.3.7",

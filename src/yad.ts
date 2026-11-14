@@ -913,7 +913,8 @@ export class Yad {
 
   private selectNow(): void {
     const now = new Date();
-    const day = this.clamp(stripTime(now));
+    // "Now" means today: if today cannot be selected, do nothing (rather than picking the nearest day).
+    const day = stripTime(now);
     if (!this.settings.timeOnly && !this.isSelectable(day)) {
       return;
     }
@@ -1266,7 +1267,7 @@ export class Yad {
     let html = '<div class="yad-buttonpane">';
     if (this.hasTime) {
       // "Now" selects the current date and time (the timepicker addon's behaviour).
-      const nowEnabled = !this.disabled && (s.timeOnly || this.isSelectable(this.clamp(today)));
+      const nowEnabled = !this.disabled && (s.timeOnly || this.isSelectable(today));
       html += `<button type="button" class="yad-current" data-action="now"${nowEnabled ? '' : ' disabled'}>` +
         `${escapeHtml(s.nowText)}</button>`;
     } else {

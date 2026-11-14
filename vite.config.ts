@@ -15,5 +15,17 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     globals: true,
+    coverage: {
+      provider: 'v8',
+      include: ['src/**/*.ts'],
+      reporter: ['text', 'html'],
+      // CI fails if coverage drops below these (currently ~99.7% lines, ~97.7% branches).
+      thresholds: {
+        lines: 98,
+        statements: 98,
+        functions: 100,
+        branches: 95,
+      },
+    },
   },
 });
