@@ -927,7 +927,8 @@ export class Yad {
     }
   }
 
-  private updateAltField(): void {
+  /** Write the selection to altField in altFormat, or `invalidText` (the input as typed) when it does not parse. */
+  private updateAltField(invalidText?: string): void {
     const s = this.settings;
     if (!s.altField) {
       return;
@@ -938,8 +939,8 @@ export class Yad {
     if (!field) {
       return;
     }
-    let text = '';
-    if (this.selected) {
+    let text = invalidText ?? '';
+    if (invalidText === undefined && this.selected) {
       const datePart = s.timeOnly ? '' : this.formatDate(this.selected, s.altFormat || s.dateFormat);
       const timePart = this.hasTime ? this.formatTimeText(this.time, s.altTimeFormat || s.timeFormat) : '';
       text = datePart && timePart ? datePart + (s.altSeparator || s.separator) + timePart : datePart || timePart;
@@ -1442,19 +1443,32 @@ export class Yad {
     if (!this.input || this.writing) {
       return;
     }
-    // Incomplete input does not parse: keep the calendar as it is.
-    const parsed = this.parseValue(this.input.value);
-    if (parsed?.date && this.inRange(parsed.date)) {
-      this.selected = parsed.date;
-      if (parsed.time) {
-        this.time = this.clampTime(parsed.time, parsed.date);
-      }
+    const text = this.input.value;
+    if (!text) {
+      // Emptied: no date, so a form does not submit the previous one through altField.
+      this.selected = null;
       this.updateAltField();
-      this.moveCursor(parsed.date, true);
-      this.lastDateText = this.input.value;
+      this.lastDateText = '';
       this.refresh();
       this.link?.partner.refresh();
+      return;
     }
+    const parsed = this.parseValue(text);
+    if (!parsed?.date || !this.inRange(parsed.date)) {
+      // Invalid, incomplete or out of range: keep the calendar as it is, but do not leave the previous date in
+      // altField. It gets the text as typed, so server-side validation rejects it instead of saving the old date.
+      this.updateAltField(text);
+      return;
+    }
+    this.selected = parsed.date;
+    if (parsed.time) {
+      this.time = this.clampTime(parsed.time, parsed.date);
+    }
+    this.updateAltField();
+    this.moveCursor(parsed.date, true);
+    this.lastDateText = text;
+    this.refresh();
+    this.link?.partner.refresh();
   };
 
   private onInputKeyDown = (e: KeyboardEvent): void => {

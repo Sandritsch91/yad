@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- `altField` no longer keeps the previous date when the user empties the input or types invalid text, so a form
+  could silently submit a date the user had removed. An emptied input now clears `altField` (and the selection).
+  Invalid or out-of-range text is copied to `altField` as typed, so server-side validation rejects it;
+  `getDate()` still returns the last valid date, as in jQuery UI.
+
 ## [1.2.0] - 2026-11-14
 
 ### Added

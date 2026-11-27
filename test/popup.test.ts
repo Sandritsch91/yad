@@ -285,6 +285,56 @@ describe('altField', () => {
     expect(alt.value).toBe('');
   });
 
+  const type = (text: string): void => {
+    input().value = text;
+    input().dispatchEvent(new Event('input'));
+  };
+
+  it('is cleared when the input is emptied', () => {
+    const dp = popup({ altField: '#other' });
+    dp.setDate(d(2026, 11, 20));
+    expect(input('other').value).toBe('2026-11-20');
+    type('');
+    expect(input('other').value).toBe('');
+    expect(dp.getDate()).toBeNull();
+  });
+
+  it('gets the text as typed while it is invalid, instead of keeping the previous date', () => {
+    const dp = popup({ dateFormat: 'dd.mm.yy', altField: '#other', altFormat: 'yy-mm-dd' });
+    dp.setDate(d(2024, 5, 10));
+    type('01.06.2024');
+    expect(input('other').value).toBe('2024-06-01');
+    type('45.13.2024');
+    expect(input('other').value).toBe('45.13.2024');
+    // Like jQuery UI, the selection itself stays at the last valid date.
+    expect(dp.getDate()).toEqual(d(2024, 6, 1));
+    type('02.06.2024');
+    expect(input('other').value).toBe('2024-06-02');
+  });
+
+  it('gets the text as typed for a date outside the range', () => {
+    popup({ minDate: 0, altField: '#other' }).setDate(d(2026, 11, 20));
+    type('2020-01-01');
+    expect(input('other').value).toBe('2020-01-01');
+  });
+
+  it('is cleared for an emptied date and time input', () => {
+    const dp = popup({ showTime: true, timeFormat: 'HH:mm', altField: '#other' });
+    dp.setDate(d(2026, 11, 20, 9, 30));
+    expect(input('other').value).toBe('2026-11-20 09:30');
+    type('');
+    expect(input('other').value).toBe('');
+  });
+
+  it('emptying redraws the open calendar without a selection', () => {
+    const dp = popup({ altField: '#other' });
+    dp.setDate(d(2026, 11, 20));
+    dp.show();
+    expect(q(dp, '.yad-selected')).not.toBeNull();
+    type('');
+    expect(q(dp, '.yad-selected')).toBeNull();
+  });
+
   it('ignores a selector that matches nothing', () => {
     const dp = popup({ altField: '#missing' });
     expect(() => dp.setDate(d(2026, 11, 20))).not.toThrow();

@@ -123,7 +123,7 @@ restores the previous `autocomplete` value.
 
 | Option | Type | Default | Description |
 |---|---|---|---|
-| `altField` | `string \| HTMLInputElement \| null` | `null` | Selector or element of another input that receives the selected date in `altFormat`. Typical use: show a friendly format to the user and submit a machine-readable one. |
+| `altField` | `string \| HTMLInputElement \| null` | `null` | Selector or element of another input that receives the selected date in `altFormat`. Typical use: show a friendly format to the user and submit a machine-readable one. Emptying the input empties it; while the input holds text that is not a valid, allowed date, it receives that text as typed, so the server can reject it. |
 | `altFormat` | `string` | `''` | Format for `altField`. Empty means `dateFormat`. |
 | `altTimeFormat` | `string` | `''` | Time format for `altField` when the time picker is on. Empty means `timeFormat`. |
 | `altSeparator` | `string` | `''` | Text between date and time in `altField`. Empty means `separator`. |
