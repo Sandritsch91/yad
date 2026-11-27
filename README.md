@@ -42,7 +42,7 @@ As a classic script, which sets `window.yad`:
 </script>
 ```
 
-Pin a version in production, e.g. `@sandritsch91/yad@1.2.0`.
+Pin a version in production, e.g. `@sandritsch91/yad@1.2.1`.
 
 | jQuery UI                                   | yad                               |
 |---------------------------------------------|-----------------------------------|
